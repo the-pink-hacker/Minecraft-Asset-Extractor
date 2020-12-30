@@ -3,16 +3,24 @@ from zipfile import ZipFile
 from pathlib import Path
 import array as arr
 
+# This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
+
 # Change this if you want to put the sound files somewhere else
 OUTPUT_PATH = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
 def Extract():
+	# 1.16 or 1.17
 	MC_VERSION = input("Minecraft Version: ")
+	# 1.16.4 or 20w51a
 	MC_VERSION_FULL = input("Full Minecraft Version: ")
+	# file-name RESOURCE_PACK_VERSION.zip this will be removed soon becuase it was for Vanilla Template creation.
 	RESOURCE_PACK_VERSION = input("Resource Pack Version: ")
+	# 6 = 1.16.4, 7 = 1.17
 	MC_PACK = input("Pack Format: ")
+	# Weather sounds will be extracted.
 	SOUND = input("Sounds? ")
-	SOUND_BOOL = "false"
+	# Weather sounds will be extracted.
+	SOUND_BOOL = "False"
 
 	if SOUND.lower() == "yes":
 		SOUND = "s";
@@ -24,7 +32,7 @@ def Extract():
 		SOUND = "null"
 		SOUND_BOOL = "False"
 
-	# This section should work on any system as well
+	# Some of this code works on other operating systems, but I don't think of of it does.
 	os.system("cls")
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
@@ -41,6 +49,7 @@ def Extract():
 		os.system("cls")
 		Extract()
 
+	# Compatibility fixes
 	if int(MC_VERSION.split(".")[1]) == 13:
 		MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/1.13.1.json"
 	elif int(MC_VERSION.split(".")[1]) >= 8:
@@ -50,12 +59,14 @@ def Extract():
 	else:
 		MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/legacy.json"
 
+	# Where the unextracted asset files are.
 	MC_OBJECTS_PATH = f"{MC_ASSETS}/objects"
+	# How it finds out weather it is an asset or somthing else.
 	MC_SOUNDS = r"minecraft/"
 
-	if SOUND == "s":
+	if SOUND_BOOL == "True":
 		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL} v{RESOURCE_PACK_VERSION} (sounds)"
-	elif SOUND == "null":
+	elif SOUND_BOOL == "False":
 		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL} v{RESOURCE_PACK_VERSION}"
 
 	os.system("cls")
@@ -97,9 +108,9 @@ def Extract():
 		length = 0
 		current = 0
 
-		if SOUND == "s":
+		if SOUND_BOOL == "True":
 			print("Extracting Sounds And Languages")
-		elif SOUND == "null":
+		elif SOUND_BOOL == "False":
 			print("Extracting Languages")
 
 		for fpath, fhash in sounds.items():
@@ -110,9 +121,9 @@ def Extract():
 			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == "l":
 				current += 1
 			
-				if SOUND == "s":
+				if SOUND_BOOL == "True":
 					print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
-				elif SOUND == "null":
+				elif SOUND_BOOL == "False":
 					print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
 
 				# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
@@ -126,7 +137,7 @@ def Extract():
 				shutil.copyfile(src_fpath, dest_fpath)
 
 	PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
-
+	
 	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{MC_VERSION_FULL}"), exist_ok=True)
 
 	# Data to be written 
@@ -140,7 +151,7 @@ def Extract():
 	# Serializing json  
 	json_object = json.dumps(dictionary, indent = 3)
 
-	# Writing to sample.json 
+	# Creates json file
 	with open(f"{OUTPUT_PATH}\\{MC_VERSION_FULL}\\pack.mcmeta", "w") as outfile:
 		outfile.write(json_object)
 
@@ -148,6 +159,7 @@ def Extract():
 
 	input(f"Extracted All Assets To {OUTPUT_PATH}\\{MC_VERSION_FULL} ")
 
+	# Adds The current pack to the array.
 	resource_packs.append(os.path.normpath(f"{OUTPUT_PATH}\\{MC_VERSION_FULL}"))
 
 	CONTINUE = input("Do you want extract another pack? ")
@@ -180,6 +192,7 @@ def Extract():
 		os.system("cls")
 		Extract()
 
+# So it knows what packs you have extracted.
 resource_packs = []
 
 Extract()
