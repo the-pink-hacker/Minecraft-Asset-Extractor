@@ -195,4 +195,4 @@ def Extract():
 # So it knows what packs you have extracted.
 resource_packs = []
 
-Extract()
+#Extract()

@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Minecraft-Asset-Extractor", "Minecraft-Asset-Extractor.pyproj", "{8DDE4807-8DFD-4DEF-B8DA-3E7CF5D454B6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DDE4807-8DFD-4DEF-B8DA-3E7CF5D454B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DDE4807-8DFD-4DEF-B8DA-3E7CF5D454B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {220D70B9-D043-4E9D-B4D7-8E69DC5D620E}
+	EndGlobalSection
+EndGlobal
