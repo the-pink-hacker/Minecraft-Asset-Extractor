@@ -13,3 +13,4 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
 - Make sure that is is user friendly.
   - GUI
 - Saving last used settings.
+- Pack into an .exe.
