@@ -13,7 +13,7 @@ def Extract():
 	MC_VERSION = input("Minecraft Version: ")
 	# 1.16.4 or 20w51a
 	MC_VERSION_FULL = input("Full Minecraft Version: ")
-	# file-name RESOURCE_PACK_VERSION.zip this will be removed soon becuase it was for Vanilla Template creation.
+	# file-name RESOURCE_PACK_VERSION.zip this will be removed soon because it was for Vanilla Template creation.
 	RESOURCE_PACK_VERSION = input("Resource Pack Version: ")
 	# 6 = 1.16.4, 7 = 1.17
 	MC_PACK = input("Pack Format: ")
@@ -192,7 +192,7 @@ def Extract():
 		os.system("cls")
 		Extract()
 
-# So it knows what packs you have extracted.
+# So it knows what packs you have extracted. Will be removed
 resource_packs = []
 
 #Extract()
