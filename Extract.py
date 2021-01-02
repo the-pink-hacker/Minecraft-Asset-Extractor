@@ -8,31 +8,14 @@ import array as arr
 # Change this if you want to put the sound files somewhere else
 OUTPUT_PATH = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
-def Extract():
-	# 1.16 or 1.17
-	MC_VERSION = input("Minecraft Version: ")
-	# 1.16.4 or 20w51a
-	MC_VERSION_FULL = input("Full Minecraft Version: ")
-	# file-name RESOURCE_PACK_VERSION.zip this will be removed soon because it was for Vanilla Template creation.
-	RESOURCE_PACK_VERSION = input("Resource Pack Version: ")
-	# 6 = 1.16.4, 7 = 1.17
-	MC_PACK = input("Pack Format: ")
-	# Weather sounds will be extracted.
-	SOUND = input("Sounds? ")
-	# Weather sounds will be extracted.
-	SOUND_BOOL = "False"
+def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, MC_PACK, AUTO_PACK, SOUNDS, ZIP_FILES, COMPATIBILITY):
 
-	if SOUND.lower() == "yes":
+	if SOUNDS == True:
 		SOUND = "s";
-		SOUND_BOOL = "True"
-	elif SOUND.lower() == "no":
-		SOUND = "null";
-		SOUND_BOOL = "False"
 	else:
 		SOUND = "null"
-		SOUND_BOOL = "False"
 
-	# Some of this code works on other operating systems, but I don't think of of it does.
+	# Some of this code works on other operating systems, but I don't think all of it does.
 	os.system("cls")
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
@@ -41,7 +24,7 @@ def Extract():
 		MC_ASSETS = os.path.expanduser("~\\.minecraft\\assets")
 		MC_VERSION_JAR = os.path.expanduser("~\\.minecraft\\versions\\" + MC_VERSION_FULL + "\\" + MC_VERSION_FULL + ".jar")
 
-	print(f"OS: {platform.system()} \nMinecraft Version: {MC_VERSION} \nFull Minecraft Version: {MC_VERSION_FULL} \nPack Format: {MC_PACK} \nSounds: {SOUND_BOOL} \nMinecraft Version Location: {MC_VERSION_JAR}")
+	print(f"OS: {platform.system()} \nMinecraft Version: {MC_VERSION} \nFull Minecraft Version: {MC_VERSION_FULL} \nPack Format: {MC_PACK} \nSounds: {SOUNDS} \nMinecraft Version Location: {MC_VERSION_JAR}")
 
 	CORRECT = input("Is the infomation correct? ")
 
@@ -50,24 +33,25 @@ def Extract():
 		Extract()
 
 	# Compatibility fixes
-	if int(MC_VERSION.split(".")[1]) == 13:
-		MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/1.13.1.json"
-	elif int(MC_VERSION.split(".")[1]) >= 8:
-		MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/{MC_VERSION}.json"
-	elif int(MC_VERSION.split(".")[1]) == 7:
-		MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/{MC_VERSION_FULL}.json"
-	else:
-		MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/legacy.json"
+	if COMPATIBILITY == True:
+		if int(MC_VERSION.split(".")[1]) == 13:
+			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/1.13.1.json"
+		elif int(MC_VERSION.split(".")[1]) >= 8:
+			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/{MC_VERSION}.json"
+		elif int(MC_VERSION.split(".")[1]) == 7:
+			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/{MC_VERSION_FULL}.json"
+		else:
+			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/legacy.json"
 
 	# Where the unextracted asset files are.
 	MC_OBJECTS_PATH = f"{MC_ASSETS}/objects"
 	# How it finds out weather it is an asset or somthing else.
 	MC_SOUNDS = r"minecraft/"
 
-	if SOUND_BOOL == "True":
-		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL} v{RESOURCE_PACK_VERSION} (sounds)"
-	elif SOUND_BOOL == "False":
-		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL} v{RESOURCE_PACK_VERSION}"
+	if SOUNDS == "True":
+		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL} (sounds)"
+	elif SOUNDS == "False":
+		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL}"
 
 	os.system("cls")
 
@@ -108,9 +92,9 @@ def Extract():
 		length = 0
 		current = 0
 
-		if SOUND_BOOL == "True":
+		if SOUNDS == "True":
 			print("Extracting Sounds And Languages")
-		elif SOUND_BOOL == "False":
+		elif SOUNDS == "False":
 			print("Extracting Languages")
 
 		for fpath, fhash in sounds.items():
@@ -121,9 +105,9 @@ def Extract():
 			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == "l":
 				current += 1
 			
-				if SOUND_BOOL == "True":
+				if SOUNDS == "True":
 					print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
-				elif SOUND_BOOL == "False":
+				elif SOUNDS == "False":
 					print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
 
 				# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
