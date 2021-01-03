@@ -10,7 +10,7 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
   - Windows (Only OS I have access to)
   - Linux
   - Mac
-- Make sure that is is user friendly.
+- Make sure that it is user friendly.
   - GUI
 - Saving last used settings.
 - Pack into an .exe.
