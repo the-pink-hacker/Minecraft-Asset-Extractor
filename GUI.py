@@ -1,17 +1,16 @@
-import os, Extract, webbrowser
+import os, webbrowser
+from Extract import *
 from tkinter import *
 from tkinter import filedialog
 
 def extract():
-	
-	print(bool(soundsBool.get()))
-
 	Extract.Extract(
 	os.path.normpath(outputLocation.get()), # Output Location
 	packName.get(), # Pack Name
 	minecraftVersion.get(), # Minecraft Version
 	minecraftVersionFull.get(), # Full Minecraft Version
 	packPNGSelect.get(), # pack.png
+	description.get(), # Description
 	formatChoices.get(), # Pack Format
 	bool(autoPackBool.get()), # Auto Pack Format
 	bool(soundsBool.get()), # Sounds
@@ -90,7 +89,7 @@ def creditUI():
 	planetMC.grid(row=7, column=0, sticky="W")
 	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
 
-	version = Label(credit, text="V0.2.0 - Alpha")
+	version = Label(credit, text="V0.2.1 - Alpha")
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
 	closeButton = Button(credit, text="Close", command=lambda:closeCredit(credit))
@@ -161,10 +160,14 @@ packPNGSelect.grid(row=10, column=0, sticky="W")
 packPNGSelectButton = Button(root, text="Select File", command=openFile, state="disabled")
 packPNGSelectButton.grid(row=10, column=1)
 
-packFormatText = Label(root, text="Pack Format:").grid(row=11, column=0, sticky="W")
+descriptionText = Label(root, text="Description:").grid(row=11, column=0, sticky="W")
+description = Entry(root, width=50)
+description.grid(row=12, column=0, sticky="W")
+
+packFormatText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
 packFormat = OptionMenu(root, formatChoices, *packFormats)
 packFormat.configure(state="disabled")
-packFormat.grid(row=12, column=0, sticky="W")
+packFormat.grid(row=14, column=0, sticky="W")
 
 ### Options
 sounds = Checkbutton(root, variable=soundsBool).grid(row=3, column=2, sticky="E")

@@ -5,9 +5,28 @@ import array as arr
 
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY):
+def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY):
+	
+	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
-		print("Auto Pack")
+		if int(MC_VERSION.split(".")[1]) == 16:
+			if int(MC_VERSION_FULL.split(".")[2]) >= 2:
+				MC_PACK = 6
+			else:
+				MC_PACK = 5
+		elif int(MC_VERSION.split(".")[1]) == 15:
+			MC_PACK = 5
+		elif int(MC_VERSION.split(".")[1]) == 15:
+			MC_PACK = 5
+		elif int(MC_VERSION.split(".")[1]) == 13:
+			MC_PACK = 4
+		elif int(MC_VERSION.split(".")[1]) == 11:
+			MC_PACK = 3
+		elif int(MC_VERSION.split(".")[1]) == 9:
+			MC_PACK = 2
+		elif int(MC_VERSION.split(".")[1]) == 8:
+			if int(MC_VERSION_FULL.split(".")[2]) == 1:
+				MC_PACK = 1
 
 	if SOUNDS == True:
 		SOUND = "s";
@@ -77,44 +96,49 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, MC_PA
 
 	os.system("cls")
 
-	# Handles files that are not in .jar
-	with open(MC_OBJECT_INDEX, "r") as read_file:
-		# Parse the JSON file into a dictionary
-		data = json.load(read_file)
+	if SOUNDS or LANGBOOL:
+		# Handles files that are not in .jar
+		with open(MC_OBJECT_INDEX, "r") as read_file:
+			# Parse the JSON file into a dictionary
+			data = json.load(read_file)
 
-		# Find each line with MC_SOUNDS prefix, remove the prefix and keep the rest of the path and the hash
-		sounds = {k[len(MC_SOUNDS):] : v["hash"] for (k,v) in data["objects"].items() if k.startswith(MC_SOUNDS)}
+			# Find each line with MC_SOUNDS prefix, remove the prefix and keep the rest of the path and the hash
+			sounds = {k[len(MC_SOUNDS):] : v["hash"] for (k,v) in data["objects"].items() if k.startswith(MC_SOUNDS)}
 
-		length = 0
-		current = 0
+			length = 0
+			current = 0
 
-		if SOUNDS == "True":
-			print("Extracting Sounds And Languages")
-		elif SOUNDS == "False":
-			print("Extracting Languages")
+			if SOUNDS and LANGBOOL:
+				print("Extracting Sounds And Languages.")
+			elif not SOUNDS and LANGBOOL:
+				print("Extracting Languages.")
+			elif SOUNDS and not LANGBOOL:
+				print("Extracting Sounds.")
 
-		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
-				length += 1
+			for fpath, fhash in sounds.items():
+				if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+					length += 1
 
-		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
-				current += 1
-			
-				if SOUNDS == "True":
-					print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
-				elif SOUNDS == "False":
-					print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+			for fpath, fhash in sounds.items():
+				if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+					current += 1
 
-				# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
-				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
-				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}/assets/minecraft/{fpath}")
-				#print(fpath)
-				# Make any directories needed to put the output file into as Python expects
-				os.makedirs(os.path.dirname(dest_fpath), exist_ok=True)
+					if SOUNDS and LANGBOOL:
+						print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					elif not SOUNDS and LANGBOOL:
+						print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					elif SOUNDS and not LANGBOOL:
+						print("Extracting Sounds Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
 
-				# Copy the file
-				shutil.copyfile(src_fpath, dest_fpath)
+					# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
+					src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
+					dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}/assets/minecraft/{fpath}")
+					#print(fpath)
+					# Make any directories needed to put the output file into as Python expects
+					os.makedirs(os.path.dirname(dest_fpath), exist_ok=True)
+
+					# Copy the file
+					shutil.copyfile(src_fpath, dest_fpath)
 
 	PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
 	
@@ -124,7 +148,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, MC_PA
 	dictionary ={
 	"pack": {
 		"pack_format": int(MC_PACK),
-		"description": "put what ever you want here."
+		"description": DESCRIPTION
 	}
 }
 
@@ -140,7 +164,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, MC_PA
 	print(f"Extracted All Assets To {OUTPUT_PATH}\\{MC_VERSION_FULL} ")
 
 	if ZIP_FILES == False:
-		input("Finished. ")
+		print("Finished. ")
 	else:
 		os.system("cls")
 
@@ -154,4 +178,4 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, MC_PA
 
 		shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"))
 
-		input("Finished. ")
+		print("Finished. ")
