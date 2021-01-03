@@ -3,7 +3,21 @@ from tkinter import *
 from tkinter import filedialog
 
 def extract():
-	Extract.Extract()
+	
+	print(bool(soundsBool.get()))
+
+	Extract.Extract(
+	os.path.normpath(outputLocation.get()), # Output Location
+	packName.get(), # Pack Name
+	minecraftVersion.get(), # Minecraft Version
+	minecraftVersionFull.get(), # Full Minecraft Version
+	packPNGSelect.get(), # pack.png
+	formatChoices.get(), # Pack Format
+	bool(autoPackBool.get()), # Auto Pack Format
+	bool(soundsBool.get()), # Sounds
+	bool(languagesBool.get()), # LANG
+	bool(zipBool.get()), # Zip
+	bool(compatibilityBool.get())) # Compatibility
 
 def openFolder():
 	folder = filedialog.askdirectory(initialdir=os.path.normpath("C://"), title="Select Output Location")
@@ -13,12 +27,16 @@ def openFolder():
 		outputLocation.insert(0, folder)
 
 def openFile():
-	filedialog.askopenfile(initialdir=os.path.normpath("C://"), title="Select File", filetypes =(("PNG", "*.png"),("JPG", "*.jpg"),("All Files","*.*")))
+	folder = filedialog.askopenfilename(initialdir=os.path.normpath("C://"), title="Select File", filetypes =(("PNG", "*.png"),("All Files","*.*")))
+
+	if folder != "":
+		packPNGSelect.delete(0, END)
+		packPNGSelect.insert(0, folder)
 
 def packFormatButton():
-	if autoPackBool.get() == True:
+	if autoPackBool.get() == False:
 		packFormat.configure(state="active")
-	elif autoPackBool.get() == False:
+	elif autoPackBool.get() == True:
 		packFormat.configure(state="disabled")
 
 def packPNGButton():
@@ -75,7 +93,7 @@ def creditUI():
 	version = Label(credit, text="V0.2.0 - Alpha")
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(credit, text="Close", command= lambda: closeCredit(credit))
+	closeButton = Button(credit, text="Close", command=lambda:closeCredit(credit))
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 
 	credit.mainloop()
@@ -95,6 +113,10 @@ root = Tk()
 
 autoPackBool = IntVar()
 packPNGBool = IntVar()
+soundsBool = IntVar()
+languagesBool = IntVar()
+compatibilityBool = IntVar()
+zipBool = IntVar()
 
 # Sets defualt value.
 formatChoices = StringVar(root)
@@ -145,13 +167,13 @@ packFormat.configure(state="disabled")
 packFormat.grid(row=12, column=0, sticky="W")
 
 ### Options
-sounds = Checkbutton(root).grid(row=3, column=2, sticky="E")
+sounds = Checkbutton(root, variable=soundsBool).grid(row=3, column=2, sticky="E")
 soundsText = Label(root, text="Sound Files").grid(row=3, column=3, sticky="W")
 
-languages = Checkbutton(root).grid(row=4, column=2, sticky="E")
+languages = Checkbutton(root, variable=languagesBool).grid(row=4, column=2, sticky="E")
 languagesText = Label(root, text="Lang Files").grid(row=4, column=3, sticky="W")
 
-compatibilityFixes = Checkbutton(root)
+compatibilityFixes = Checkbutton(root, variable=compatibilityBool)
 compatibilityFixes.grid(row=5, column=2, sticky="E")
 compatibilityFixes.select()
 compatibilityFixesText = Label(root, text="Compatibility Fixes").grid(row=5, column=3, sticky="W")
@@ -162,13 +184,14 @@ packPNGText = Label(root, text="Custom Pack Image").grid(row=6, column=3, sticky
 
 autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool)
 autoPack.grid(row=7, column=2, sticky="E")
+autoPack.select()
 autoPackText = Label(root, text="Auto Pack Format").grid(row=7, column=3, sticky="W")
 
-zip = Checkbutton(root)
+zip = Checkbutton(root, variable=zipBool)
 zip.grid(row=8, column=2, sticky="E")
 zipText = Label(root, text="Zip Files").grid(row=8, column=3, sticky="W")
 
 ### Bottom
-extractButton = Button(root, text="Extract", command=extract).place(relx=1.0, rely=1.0, anchor="se")
+extractButton = Button(root, text="Extract", command=lambda:extract()).place(relx=1.0, rely=1.0, anchor="se")
 
 root.mainloop()

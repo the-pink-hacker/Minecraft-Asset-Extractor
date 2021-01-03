@@ -5,15 +5,19 @@ import array as arr
 
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 
-# Change this if you want to put the sound files somewhere else
-OUTPUT_PATH = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
-
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, MC_PACK, AUTO_PACK, SOUNDS, ZIP_FILES, COMPATIBILITY):
+def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY):
+	if AUTO_PACK == True:
+		print("Auto Pack")
 
 	if SOUNDS == True:
 		SOUND = "s";
 	else:
 		SOUND = "null"
+
+	if LANGBOOL == True:
+		LANG = "l";
+	else:
+		LANG = "null"
 
 	# Some of this code works on other operating systems, but I don't think all of it does.
 	os.system("cls")
@@ -23,14 +27,6 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, MC_PACK, AUTO_P
 	else:
 		MC_ASSETS = os.path.expanduser("~\\.minecraft\\assets")
 		MC_VERSION_JAR = os.path.expanduser("~\\.minecraft\\versions\\" + MC_VERSION_FULL + "\\" + MC_VERSION_FULL + ".jar")
-
-	print(f"OS: {platform.system()} \nMinecraft Version: {MC_VERSION} \nFull Minecraft Version: {MC_VERSION_FULL} \nPack Format: {MC_PACK} \nSounds: {SOUNDS} \nMinecraft Version Location: {MC_VERSION_JAR}")
-
-	CORRECT = input("Is the infomation correct? ")
-
-	if CORRECT.lower() == "no":
-		os.system("cls")
-		Extract()
 
 	# Compatibility fixes
 	if COMPATIBILITY == True:
@@ -98,11 +94,11 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, MC_PACK, AUTO_P
 			print("Extracting Languages")
 
 		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == "l":
+			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
 				length += 1
 
 		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == "l":
+			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
 				current += 1
 			
 				if SOUNDS == "True":
@@ -141,42 +137,21 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, MC_PACK, AUTO_P
 
 	shutil.copyfile(PACK_PNG, os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}/pack.png"))
 
-	input(f"Extracted All Assets To {OUTPUT_PATH}\\{MC_VERSION_FULL} ")
+	print(f"Extracted All Assets To {OUTPUT_PATH}\\{MC_VERSION_FULL} ")
 
-	# Adds The current pack to the array.
-	resource_packs.append(os.path.normpath(f"{OUTPUT_PATH}\\{MC_VERSION_FULL}"))
-
-	CONTINUE = input("Do you want extract another pack? ")
-
-	if CONTINUE.lower() == "no":
-		ZIP_FILES = input("Do you want to zip files? ")
-
-		if ZIP_FILES.lower() == "no":
-			input("Finished. ")
-		else:
-			os.system("cls")
-			for pack in resource_packs:
-					if pack != "":
-						print(f"Ziping {pack}...")
-
-						shutil.make_archive(os.path.normpath(f"{pack}"), 'zip', os.path.normpath(f"{pack}"))
-
-						print("Zipped")
-
-			DELETE = input("Do you want to delete files? ")
-			os.system("cls")
-
-			if DELETE.lower() == "yes":
-				for pack in resource_packs:
-					if pack != "":
-						shutil.rmtree(pack)
-						print(f"Deleted {pack}")
-			input("Finished. ")
+	if ZIP_FILES == False:
+		input("Finished. ")
 	else:
 		os.system("cls")
-		Extract()
 
-# So it knows what packs you have extracted. Will be removed
-resource_packs = []
+		print(f"Ziping {OUTPUT_PATH}\{MC_VERSION_FULL}...")
 
-#Extract()
+		shutil.make_archive(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"))
+
+		print("Zipped {OUTPUT_PATH}\{MC_VERSION_FULL}.")
+
+		os.system("cls")
+
+		shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"))
+
+		input("Finished. ")
