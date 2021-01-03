@@ -4,7 +4,7 @@ Rips all of the assets out of minecraft. This is a **heavly** modified version o
 ## How To Use
 ### Downloading and Installing
 1. Make sure you have python installed. Install it here: [www.python.org/downloads/](https://www.python.org/downloads/)
-2. Download [latest version](https://github.com/RyanGar46/Minecraft-Asset-Extractor/releases).
+2. Download [latest version](https://github.com/RyanGar46/Minecraft-Asset-Extractor/releases/latest).
 3. Unzip the downloaded .zip file.
 
 ### Using the Program
