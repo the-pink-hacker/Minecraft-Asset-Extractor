@@ -4,7 +4,7 @@ from tkinter import *
 from tkinter import filedialog
 
 def extract():
-	Extract.Extract(
+	Extract(
 	os.path.normpath(outputLocation.get()), # Output Location
 	packName.get(), # Pack Name
 	minecraftVersion.get(), # Minecraft Version
@@ -89,7 +89,7 @@ def creditUI():
 	planetMC.grid(row=7, column=0, sticky="W")
 	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
 
-	version = Label(credit, text="V0.2.1 - Alpha")
+	version = Label(credit, text="V0.2.1.1 - Alpha")
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
 	closeButton = Button(credit, text="Close", command=lambda:closeCredit(credit))
