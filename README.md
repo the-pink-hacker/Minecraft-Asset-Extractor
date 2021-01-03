@@ -14,6 +14,7 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
   - GUI
 - Saving last used settings.
 - Pack into an .exe.
+- Multithreading
 
 Extra things that I want to add at some point:
 - Dark mode.
