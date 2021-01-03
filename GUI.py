@@ -10,13 +10,15 @@ def extract():
 	minecraftVersion.get(), # Minecraft Version
 	minecraftVersionFull.get(), # Full Minecraft Version
 	packPNGSelect.get(), # pack.png
+	packPNGBool.get(), # Custom pack.png
 	description.get(), # Description
 	formatChoices.get(), # Pack Format
 	bool(autoPackBool.get()), # Auto Pack Format
 	bool(soundsBool.get()), # Sounds
 	bool(languagesBool.get()), # LANG
 	bool(zipBool.get()), # Zip
-	bool(compatibilityBool.get())) # Compatibility
+	bool(compatibilityBool.get()), # Compatibility
+	bool(clearBool.get())) # Clear command line
 
 def openFolder():
 	folder = filedialog.askdirectory(initialdir=os.path.normpath("C://"), title="Select Output Location")
@@ -89,7 +91,7 @@ def creditUI():
 	planetMC.grid(row=7, column=0, sticky="W")
 	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
 
-	version = Label(credit, text="V0.2.1.1 - Alpha")
+	version = Label(credit, text="V0.2.2 - Alpha")
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
 	closeButton = Button(credit, text="Close", command=lambda:closeCredit(credit))
@@ -114,8 +116,10 @@ autoPackBool = IntVar()
 packPNGBool = IntVar()
 soundsBool = IntVar()
 languagesBool = IntVar()
+snapshotsBool = IntVar()
 compatibilityBool = IntVar()
 zipBool = IntVar()
+clearBool = IntVar()
 
 # Sets defualt value.
 formatChoices = StringVar(root)
@@ -181,18 +185,26 @@ compatibilityFixes.grid(row=5, column=2, sticky="E")
 compatibilityFixes.select()
 compatibilityFixesText = Label(root, text="Compatibility Fixes").grid(row=5, column=3, sticky="W")
 
+snapshots = Checkbutton(root, variable=snapshotsBool)
+snapshots.grid(row=6, column=2, sticky="E")
+snapshotsText = Label(root, text="Is a Snapshot").grid(row=6, column=3, sticky="W")
+
 packPNG = Checkbutton(root, command=packPNGButton, variable=packPNGBool)
-packPNG.grid(row=6, column=2, sticky="E")
-packPNGText = Label(root, text="Custom Pack Image").grid(row=6, column=3, sticky="W")
+packPNG.grid(row=7, column=2, sticky="E")
+packPNGText = Label(root, text="Custom Pack Image").grid(row=7, column=3, sticky="W")
 
 autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool)
-autoPack.grid(row=7, column=2, sticky="E")
+autoPack.grid(row=8, column=2, sticky="E")
 autoPack.select()
-autoPackText = Label(root, text="Auto Pack Format").grid(row=7, column=3, sticky="W")
+autoPackText = Label(root, text="Auto Pack Format").grid(row=8, column=3, sticky="W")
 
 zip = Checkbutton(root, variable=zipBool)
-zip.grid(row=8, column=2, sticky="E")
-zipText = Label(root, text="Zip Files").grid(row=8, column=3, sticky="W")
+zip.grid(row=9, column=2, sticky="E")
+zipText = Label(root, text="Zip Files").grid(row=9, column=3, sticky="W")
+
+clear = Checkbutton(root, variable=clearBool)
+clear.grid(row=10, column=2, sticky="E")
+clearText = Label(root, text="Clear Command Line").grid(row=10, column=3, sticky="W")
 
 ### Bottom
 extractButton = Button(root, text="Extract", command=lambda:extract()).place(relx=1.0, rely=1.0, anchor="se")

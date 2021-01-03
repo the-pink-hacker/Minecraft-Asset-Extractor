@@ -3,13 +3,19 @@ from zipfile import ZipFile
 from pathlib import Path
 import array as arr
 
-# This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
+def Clear(clear):
+	if clear == True:
+		os.system("cls")
 
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY):
-	
+# This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
+def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR):
+	Clear(CLEAR)
+
 	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
-		if int(MC_VERSION.split(".")[1]) == 16:
+		if int(MC_VERSION.split(".")[1]) >= 17:
+			MC_PACK = 7
+		elif int(MC_VERSION.split(".")[1]) == 16:
 			if int(MC_VERSION_FULL.split(".")[2]) >= 2:
 				MC_PACK = 6
 			else:
@@ -39,7 +45,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCR
 		LANG = "null"
 
 	# Some of this code works on other operating systems, but I don't think all of it does.
-	os.system("cls")
+	Clear(CLEAR)
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
 		MC_VERSION_JAR = os.path.expandvars("%APPDATA%\\.minecraft\\versions\\" + MC_VERSION_FULL + "\\" + MC_VERSION_FULL + ".jar")
@@ -63,12 +69,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCR
 	# How it finds out weather it is an asset or somthing else.
 	MC_SOUNDS = r"minecraft/"
 
-	if SOUNDS == "True":
-		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL} (sounds)"
-	elif SOUNDS == "False":
-		MC_VERSION_FULL = f"resource pack template {MC_VERSION_FULL}"
-
-	os.system("cls")
+	Clear(CLEAR)
 
 	# Opens the .jar
 	with ZipFile(MC_VERSION_JAR, 'r') as zip:
@@ -89,12 +90,12 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCR
 			if fileName.startswith("assets"):
 				current += 1
 				print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
-				zip.extract(fileName, OUTPUT_PATH + "\\" + MC_VERSION_FULL)
+				zip.extract(fileName, os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
 
-	if os.path.exists(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}\\assets\\.mcassetsroot")):
-		os.remove(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}\\assets\\.mcassetsroot"))
+	if os.path.exists(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}\\assets\\.mcassetsroot")):
+		os.remove(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}\\assets\\.mcassetsroot"))
 
-	os.system("cls")
+	Clear(CLEAR)
 
 	if SOUNDS or LANGBOOL:
 		# Handles files that are not in .jar
@@ -132,7 +133,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCR
 
 					# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
 					src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
-					dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}/assets/minecraft/{fpath}")
+					dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
 					#print(fpath)
 					# Make any directories needed to put the output file into as Python expects
 					os.makedirs(os.path.dirname(dest_fpath), exist_ok=True)
@@ -140,9 +141,10 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCR
 					# Copy the file
 					shutil.copyfile(src_fpath, dest_fpath)
 
-	PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
+	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or CUSTOM_PACK_PNG.replace(" ", "") == "":
+		PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
 	
-	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{MC_VERSION_FULL}"), exist_ok=True)
+	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}"), exist_ok=True)
 
 	# Data to be written 
 	dictionary ={
@@ -156,26 +158,26 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, DESCR
 	json_object = json.dumps(dictionary, indent = 3)
 
 	# Creates json file
-	with open(f"{OUTPUT_PATH}\\{MC_VERSION_FULL}\\pack.mcmeta", "w") as outfile:
+	with open(f"{OUTPUT_PATH}\\{PACK_NAME}\\pack.mcmeta", "w") as outfile:
 		outfile.write(json_object)
 
-	shutil.copyfile(PACK_PNG, os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}/pack.png"))
+	shutil.copyfile(PACK_PNG, os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/pack.png"))
 
-	print(f"Extracted All Assets To {OUTPUT_PATH}\\{MC_VERSION_FULL} ")
+	print(f"Extracted All Assets To {OUTPUT_PATH}\\{PACK_NAME} ")
 
 	if ZIP_FILES == False:
 		print("Finished. ")
 	else:
-		os.system("cls")
+		Clear(CLEAR)
 
-		print(f"Ziping {OUTPUT_PATH}\{MC_VERSION_FULL}...")
+		print(f"Ziping {OUTPUT_PATH}\{PACK_NAME}...")
 
-		shutil.make_archive(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"))
+		shutil.make_archive(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
 
-		print("Zipped {OUTPUT_PATH}\{MC_VERSION_FULL}.")
+		print("Zipped {OUTPUT_PATH}\{PACK_NAME}.")
 
-		os.system("cls")
+		Clear(CLEAR)
 
-		shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{MC_VERSION_FULL}"))
+		shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
 
 		print("Finished. ")
