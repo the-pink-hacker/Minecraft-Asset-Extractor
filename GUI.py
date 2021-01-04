@@ -2,13 +2,14 @@ import os, webbrowser
 from Extract import *
 from tkinter import *
 from tkinter import filedialog
+from datetime import datetime
 
 def extract():
 	Extract(
 	os.path.normpath(outputLocation.get()), # Output Location
 	packName.get(), # Pack Name
 	minecraftVersion.get(), # Minecraft Version
-	minecraftVersionFull.get(), # Full Minecraft Version
+	f"{snapshotYear.get()}w{snapshotWeek.get()}{snapshotLetterSelection.get()}", # Snapshot
 	packPNGSelect.get(), # pack.png
 	packPNGBool.get(), # Custom pack.png
 	description.get(), # Description
@@ -91,7 +92,7 @@ def creditUI():
 	planetMC.grid(row=7, column=0, sticky="W")
 	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
 
-	version = Label(credit, text="V0.2.2 - Alpha")
+	version = Label(credit, text="V0.3.0 - Alpha")
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
 	closeButton = Button(credit, text="Close", command=lambda:closeCredit(credit))
@@ -110,6 +111,14 @@ packFormats = [
 "7"
 ]
 
+# Creates the available choices in the snapshot letters drop down.
+snapshotLetters = [
+"a",
+"b",
+"c",
+"d"
+]
+
 root = Tk()
 
 autoPackBool = IntVar()
@@ -120,6 +129,11 @@ snapshotsBool = IntVar()
 compatibilityBool = IntVar()
 zipBool = IntVar()
 clearBool = IntVar()
+deleteBool = IntVar()
+
+# Sets defualt value.
+snapshotLetterSelection = StringVar(root)
+snapshotLetterSelection.set(snapshotLetters[0])
 
 # Sets defualt value.
 formatChoices = StringVar(root)
@@ -148,15 +162,26 @@ packNameText = Label(root, text="Resource Pack Name:").grid(row=3, column=0, sti
 packName = Entry(root, width=50)
 packName.grid(row=4, column=0, sticky="W")
 
-minecraftVersionText = Label(root, text="Minecraft Version (e.g. 1.16, 1.17):").grid(row=5, column=0, sticky="W")
+minecraftVersionText = Label(root, text="Minecraft Version (e.g. 1.16.4, 1.17):").grid(row=5, column=0, sticky="W")
 minecraftVersion = Entry(root, width=50)
-minecraftVersion.insert(0, "1.16")
+minecraftVersion.insert(0, "1.16.4")
 minecraftVersion.grid(row=6, column=0, sticky="W")
 
-minecraftVersionFullText = Label(root, text="Full Minecraft Version (e.g. 1.16.4, 20w51a):").grid(row=7, column=0, sticky="W")
-minecraftVersionFull = Entry(root, width=50)
-minecraftVersionFull.insert(0, "1.16.4")
-minecraftVersionFull.grid(row=8, column=0, sticky="W")
+snapshotText = Label(root, text="Snapshot Version:").grid(row=7, column=0, sticky="W")
+
+snapshotYearText = Label(root, text="Year:").place(x=0, y=210, anchor=W)
+snapshotYear = Entry(root, width=2)
+snapshotYear.insert(0, str(datetime.today().year)[-2:]) # I don't care that this is more robust than it needs to be.
+snapshotYear.place(x=40, y=210, anchor=W)
+
+snapshotWeekText = Label(root, text="Week:").place(x=60, y=210, anchor=W)
+snapshotWeek = Entry(root, width=2)
+snapshotWeek.insert(0, str(datetime.today().isocalendar()[1]))
+snapshotWeek.place(x=105, y=210, anchor=W)
+
+snapshotLetterText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
+snapshotLetter = OptionMenu(root, snapshotLetterSelection, *snapshotLetters)
+snapshotLetter.place(x=130, y=210, anchor=W)
 
 packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=9, column=0, sticky="W")
 packPNGSelect = Entry(root, width=50, state="disabled")
@@ -174,33 +199,37 @@ packFormat.configure(state="disabled")
 packFormat.grid(row=14, column=0, sticky="W")
 
 ### Options
-sounds = Checkbutton(root, variable=soundsBool).grid(row=3, column=2, sticky="E")
-soundsText = Label(root, text="Sound Files").grid(row=3, column=3, sticky="W")
+sounds = Checkbutton(root, variable=soundsBool).grid(row=2, column=2, sticky="E")
+soundsText = Label(root, text="Sound Files").grid(row=2, column=3, sticky="W")
 
-languages = Checkbutton(root, variable=languagesBool).grid(row=4, column=2, sticky="E")
-languagesText = Label(root, text="Lang Files").grid(row=4, column=3, sticky="W")
+languages = Checkbutton(root, variable=languagesBool).grid(row=3, column=2, sticky="E")
+languagesText = Label(root, text="Lang Files").grid(row=3, column=3, sticky="W")
 
 compatibilityFixes = Checkbutton(root, variable=compatibilityBool)
-compatibilityFixes.grid(row=5, column=2, sticky="E")
+compatibilityFixes.grid(row=4, column=2, sticky="E")
 compatibilityFixes.select()
-compatibilityFixesText = Label(root, text="Compatibility Fixes").grid(row=5, column=3, sticky="W")
+compatibilityFixesText = Label(root, text="Compatibility Fixes").grid(row=4, column=3, sticky="W")
 
 snapshots = Checkbutton(root, variable=snapshotsBool)
-snapshots.grid(row=6, column=2, sticky="E")
-snapshotsText = Label(root, text="Is a Snapshot").grid(row=6, column=3, sticky="W")
+snapshots.grid(row=5, column=2, sticky="E")
+snapshotsText = Label(root, text="Is a Snapshot").grid(row=5, column=3, sticky="W")
 
 packPNG = Checkbutton(root, command=packPNGButton, variable=packPNGBool)
-packPNG.grid(row=7, column=2, sticky="E")
-packPNGText = Label(root, text="Custom Pack Image").grid(row=7, column=3, sticky="W")
+packPNG.grid(row=6, column=2, sticky="E")
+packPNGText = Label(root, text="Custom Pack Image").grid(row=6, column=3, sticky="W")
 
 autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool)
-autoPack.grid(row=8, column=2, sticky="E")
+autoPack.grid(row=7, column=2, sticky="E")
 autoPack.select()
-autoPackText = Label(root, text="Auto Pack Format").grid(row=8, column=3, sticky="W")
+autoPackText = Label(root, text="Auto Pack Format").grid(row=7, column=3, sticky="W")
 
 zip = Checkbutton(root, variable=zipBool)
-zip.grid(row=9, column=2, sticky="E")
-zipText = Label(root, text="Zip Files").grid(row=9, column=3, sticky="W")
+zip.grid(row=8, column=2, sticky="E")
+zipText = Label(root, text="Zip Files").grid(row=8, column=3, sticky="W")
+
+delete = Checkbutton(root, variable=deleteBool)
+delete.grid(row=9, column=2, sticky="E")
+deleteText = Label(root, text="Delete Folder After Zip").grid(row=9, column=3, sticky="W")
 
 clear = Checkbutton(root, variable=clearBool)
 clear.grid(row=10, column=2, sticky="E")
