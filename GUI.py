@@ -1,4 +1,6 @@
 import os, webbrowser
+from time import sleep
+from threading import Thread
 from configparser import *
 from Extract import *
 from tkinter import *
@@ -25,8 +27,8 @@ def extract():
 	bool(clearBool.get()), # Clear command line
 	bool(deleteBool.get())) # Delets folder after zipping
 
-def openFolder():
-	folder = filedialog.askdirectory(initialdir=os.path.normpath("C://"), title="Select Output Location")
+def openFolder(parent, outputLocation):
+	folder = filedialog.askdirectory(parent=parent,initialdir=os.path.normpath("C://"), title="Select Output Location")
 	
 	if folder != "":
 		outputLocation.delete(0, END)
@@ -77,6 +79,7 @@ def closeWindow(window):
 	root.focus_force()
 
 def settingsUI():
+	global setting
 	setting = Toplevel(root)
 
 	setting.focus_force()
@@ -87,6 +90,17 @@ def settingsUI():
 
 	settingsTitleText = Label(setting, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
+
+	spacer = Label(setting, text="", pady=10).grid(row=0, column=0, sticky="NW")
+
+	global defaultOutputLocation
+
+	outputLocationText = Label(setting, text="Output Location:").grid(row=1, column=0, sticky="W")
+	defaultOutputLocation = Entry(setting, width=50)
+	defaultOutputLocation.insert(0, settingsDefaultOutputLocation)
+	defaultOutputLocation.grid(row=2, column=0, sticky="W")
+	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation))
+	outputLocationButton.grid(row=2, column=1)
 
 	closeButton = Button(setting, text="Close", command=lambda:closeWindow(setting))
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
@@ -194,7 +208,10 @@ def loadSettings():
 
 	# The fields on the left.
 	outputLocation.delete(0, END)
-	outputLocation.insert(0, read_config.get("Fields", "output_location"))
+	if read_config.get("Fields", "output_location").replace(" ", "") == "":
+		outputLocation.insert(0, os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/"))))
+	else:
+		outputLocation.insert(0, read_config.get("Fields", "output_location"))
 	packName.delete(0, END)
 	packName.insert(0, read_config.get("Fields", "name"))
 	minecraftVersion.delete(0, END)
@@ -212,6 +229,51 @@ def loadSettings():
 	description.insert(0, read_config.get("Fields", "description"))
 	formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
 	packFormatButton()
+
+	# Settings
+	global settingsDefaultOutputLocation
+	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
+		settingsDefaultOutputLocation = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
+	else:
+		outputLocation.insert(0, read_config.get("Fields", "output_location"))
+
+def on_closing():
+	# Saves the last used settings
+	write_config = ConfigParser()
+
+	# The fields on the left.
+	write_config.add_section("Fields")
+	write_config.set("Fields","output_location", outputLocation.get())
+	write_config.set("Fields","name", packName.get())
+	write_config.set("Fields","version", minecraftVersion.get())
+	write_config.set("Fields","snapshot_year", snapshotYear.get())
+	write_config.set("Fields","snapshot_week", snapshotWeek.get())
+	write_config.set("Fields","snapshot_letter", snapshotLetterSelection.get())
+	write_config.set("Fields","png", packPNGSelect.get())
+	write_config.set("Fields","description", description.get())
+	write_config.set("Fields","pack_format", formatChoices.get())
+
+	# The options on the right.
+	write_config.add_section("CheckBoxes")
+	write_config.set("CheckBoxes","snapshot", str(bool(snapshotsBool.get())))
+	write_config.set("CheckBoxes","png", str(bool(packPNGBool.get())))
+	write_config.set("CheckBoxes","auto_pack", str(bool(autoPackBool.get())))
+	write_config.set("CheckBoxes","sounds", str(bool(soundsBool.get())))
+	write_config.set("CheckBoxes","languages", str(bool(languagesBool.get())))
+	write_config.set("CheckBoxes","zip", str(bool(zipBool.get())))
+	write_config.set("CheckBoxes","compatibility", str(bool(compatibilityBool.get())))
+	write_config.set("CheckBoxes","clear", str(bool(clearBool.get())))
+	write_config.set("CheckBoxes","delete", str(bool(deleteBool.get())))
+
+	# Extra settings
+	write_config.add_section("Settings")
+	write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
+
+	cfgfile = open("settings.ini",'w')
+	write_config.write(cfgfile)
+	cfgfile.close()
+
+	root.destroy()
 
 # Creates the available choices in the pack format drop down.
 packFormats = [
@@ -259,7 +321,8 @@ root.title("Minecraft Asset Extractor")
 root.iconphoto(False, windowIcon)
 root.resizable(False, False)
 
-# Creating and placing labels.
+### Feilds
+# region
 titleText = Label(root, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 titleText.place(relx=0.5, rely=0.0, anchor="n")
 
@@ -273,7 +336,7 @@ outputLocationText = Label(root, text="Output Location:").grid(row=1, column=0, 
 outputLocation = Entry(root, width=50)
 outputLocation.insert(0, os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/"))))
 outputLocation.grid(row=2, column=0, sticky="W")
-outputLocationButton = Button(root, text="Select Folder", command=openFolder)
+outputLocationButton = Button(root, text="Select Folder", command=lambda:openFolder(root, outputLocation))
 outputLocationButton.grid(row=2, column=1)
 
 packNameText = Label(root, text="Resource Pack Name:").grid(row=3, column=0, sticky="W")
@@ -314,8 +377,10 @@ description.grid(row=12, column=0, sticky="W")
 packFormatText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
 packFormat = OptionMenu(root, formatChoices, *packFormats)
 packFormat.grid(row=14, column=0, sticky="W")
+# endregion
 
 ### Options
+# region
 sounds = Checkbutton(root, variable=soundsBool)
 sounds.grid(row=2, column=2, sticky="E")
 soundsText = Label(root, text="Sound Files").grid(row=2, column=3, sticky="W")
@@ -353,50 +418,30 @@ deleteText = Label(root, text="Delete Folder After Zip").grid(row=9, column=3, s
 clear = Checkbutton(root, variable=clearBool)
 clear.grid(row=10, column=2, sticky="E")
 clearText = Label(root, text="Clear Command Line").grid(row=10, column=3, sticky="W")
+# endregion Options
 
 ### Bottom
+# region
 extractButton = Button(root, text="Extract", command=lambda:extract()).place(relx=1.0, rely=1.0, anchor="se")
+# endregion
 
 loadSettings()
 
-def on_closing():
-	# Saves the last used settings
-	write_config = ConfigParser()
-
-	# The fields on the left.
-	write_config.add_section("Fields")
-	write_config.set("Fields","output_location", outputLocation.get())
-	write_config.set("Fields","name", packName.get())
-	write_config.set("Fields","version", minecraftVersion.get())
-	write_config.set("Fields","snapshot_year", snapshotYear.get())
-	write_config.set("Fields","snapshot_week", snapshotWeek.get())
-	write_config.set("Fields","snapshot_letter", snapshotLetterSelection.get())
-	write_config.set("Fields","png", packPNGSelect.get())
-	write_config.set("Fields","description", description.get())
-	write_config.set("Fields","pack_format", formatChoices.get())
-
-	# The options on the right.
-	write_config.add_section("CheckBoxes")
-	write_config.set("CheckBoxes","snapshot", str(bool(snapshotsBool.get())))
-	write_config.set("CheckBoxes","png", str(bool(packPNGBool.get())))
-	write_config.set("CheckBoxes","auto_pack", str(bool(autoPackBool.get())))
-	write_config.set("CheckBoxes","sounds", str(bool(soundsBool.get())))
-	write_config.set("CheckBoxes","languages", str(bool(languagesBool.get())))
-	write_config.set("CheckBoxes","zip", str(bool(zipBool.get())))
-	write_config.set("CheckBoxes","compatibility", str(bool(compatibilityBool.get())))
-	write_config.set("CheckBoxes","clear", str(bool(clearBool.get())))
-	write_config.set("CheckBoxes","delete", str(bool(deleteBool.get())))
-
-	# Extra settings
-	write_config.add_section("Settings")
-
-	cfgfile = open("settings.ini",'w')
-	write_config.write(cfgfile)
-	cfgfile.close()
-
-	root.destroy()
-
 root.protocol("WM_DELETE_WINDOW", on_closing)
+
+def grabSettings(args):
+	sleep(1)
+	while True:
+		sleep(1)
+		try:
+			global settingsDefaultOutputLocation
+			settingsDefaultOutputLocation = defaultOutputLocation.get()
+			print(settingsDefaultOutputLocation)
+		except:
+			None
+
+thread = Thread(target = grabSettings, args = (1,))
+thread.start()
 
 root.mainloop()
 
