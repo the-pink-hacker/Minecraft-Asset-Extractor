@@ -3,7 +3,7 @@ Rips all of the assets out of minecraft. This is a **heavly** modified version o
 
 ## How To Use
 ### Downloading and Installing
-1. Make sure you have python installed (Required in V0.2.2 and lower). Install it here: [www.python.org/downloads/](https://www.python.org/downloads/)
+1. Make sure you have python installed (Required in V0.2.2 - Alpha and lower). Install it here: [www.python.org/downloads/](https://www.python.org/downloads/)
 2. Download [latest version](https://github.com/RyanGar46/Minecraft-Asset-Extractor/releases/latest).
 3. Unzip the downloaded .zip file.
 
@@ -28,6 +28,16 @@ Rips all of the assets out of minecraft. This is a **heavly** modified version o
    - Clear Command Line: Clears the command line at certian points in the extraction.
   4. Hit extract.
   5. You resource pack should have been created at the output location.
+  
+## How To Compile Program
+1. Make sure you have python installed. Install it here: [www.python.org/downloads/](https://www.python.org/downloads/)
+2. Install pyinstaller through powershell:
+```powershell
+pip install pyinstaller
+```
+3. Right click on "Compile.ps1" in "Minecraft-Asset-Extractor/" and click on run with PowerShell
+4. If asked to type y/n, type y.
+5. If everything worked correctly then you should be able to launch "Minecraft-Asset-Extractor\dist\Minecraft_Asset_Extractor\Minecraft_Asset_Extractor.exe"
 
 ## Features That Need To Be Added
 This is currently in aphal and still needs a lot of work to be done. Some of the things that I need to do before V1.0 are:
