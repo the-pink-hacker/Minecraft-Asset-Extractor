@@ -1,7 +1,9 @@
 import os, webbrowser
+from configparser import *
 from Extract import *
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 from datetime import datetime
 
 def extract():
@@ -139,6 +141,78 @@ def aboutUI():
 
 	about.mainloop()
 
+def loadSettings():
+	read_config = ConfigParser()
+	read_config.read("settings.ini")
+
+	# The options on the right.
+	if read_config.get("CheckBoxes", "snapshot") == "True":
+		snapshots.select()
+	else:
+		snapshots.deselect()
+
+	if read_config.get("CheckBoxes", "png") == "True":
+		packPNG.select()
+	else:
+		packPNG.deselect()
+
+	if read_config.get("CheckBoxes", "auto_pack") == "True":
+		autoPack.select()
+	else:
+		autoPack.deselect()
+
+	if read_config.get("CheckBoxes", "sounds") == "True":
+		sounds.select()
+	else:
+		sounds.deselect()
+
+	if read_config.get("CheckBoxes", "languages") == "True":
+		languages.select()
+	else:
+		languages.deselect()
+
+	if read_config.get("CheckBoxes", "compatibility") == "True":
+		compatibilityFixes.select()
+	else:
+		compatibilityFixes.deselect()
+
+	if read_config.get("CheckBoxes", "clear") == "True":
+		clear.select()
+	else:
+		delete.deselect()
+
+	if read_config.get("CheckBoxes", "zip") == "True":
+		zip.select()
+	else:
+		zip.deselect()
+
+	if read_config.get("CheckBoxes", "delete") == "True":
+		delete.select()
+	else:
+		delete.deselect()
+	zipButton()
+
+	# The fields on the left.
+	outputLocation.delete(0, END)
+	outputLocation.insert(0, read_config.get("Fields", "output_location"))
+	packName.delete(0, END)
+	packName.insert(0, read_config.get("Fields", "name"))
+	minecraftVersion.delete(0, END)
+	minecraftVersion.insert(0, read_config.get("Fields", "version"))
+	snapshotYear.delete(0, END)
+	snapshotYear.insert(0, read_config.get("Fields", "snapshot_year"))
+	snapshotWeek.delete(0, END)
+	snapshotWeek.insert(0, read_config.get("Fields", "snapshot_week"))
+	snapshotLetterSelection.set(snapshotLetters[snapshotLetters.index(read_config.get("Fields", "snapshot_letter"))])
+	snapshotButton()
+	packPNGSelect.delete(0, END)
+	packPNGSelect.insert(0, read_config.get("Fields", "png"))
+	packPNGButton()
+	description.delete(0, END)
+	description.insert(0, read_config.get("Fields", "description"))
+	formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
+	packFormatButton()
+
 # Creates the available choices in the pack format drop down.
 packFormats = [
 "1",
@@ -216,22 +290,19 @@ snapshotText = Label(root, text="Snapshot Version:").grid(row=7, column=0, stick
 snapshotYearText = Label(root, text="Year:").place(x=0, y=210, anchor=W)
 snapshotYear = Entry(root, width=2)
 snapshotYear.insert(0, str(datetime.today().year)[-2:]) # I don't care that this is more robust than it needs to be.
-snapshotYear.configure(state="disabled")
 snapshotYear.place(x=40, y=210, anchor=W)
 
 snapshotWeekText = Label(root, text="Week:").place(x=60, y=210, anchor=W)
 snapshotWeek = Entry(root, width=2)
 snapshotWeek.insert(0, str(datetime.today().isocalendar()[1]))
-snapshotWeek.configure(state="disabled")
 snapshotWeek.place(x=105, y=210, anchor=W)
 
 snapshotLetterText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
 snapshotLetter = OptionMenu(root, snapshotLetterSelection, *snapshotLetters)
-snapshotLetter.configure(state="disabled")
 snapshotLetter.place(x=130, y=210, anchor=W)
 
 packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=9, column=0, sticky="W")
-packPNGSelect = Entry(root, width=50, state="disabled")
+packPNGSelect = Entry(root, width=50)
 packPNGSelect.grid(row=10, column=0, sticky="W")
 packPNGSelectButton = Button(root, text="Select File", command=openFile, state="disabled")
 packPNGSelectButton.grid(row=10, column=1)
@@ -242,14 +313,15 @@ description.grid(row=12, column=0, sticky="W")
 
 packFormatText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
 packFormat = OptionMenu(root, formatChoices, *packFormats)
-packFormat.configure(state="disabled")
 packFormat.grid(row=14, column=0, sticky="W")
 
 ### Options
-sounds = Checkbutton(root, variable=soundsBool).grid(row=2, column=2, sticky="E")
+sounds = Checkbutton(root, variable=soundsBool)
+sounds.grid(row=2, column=2, sticky="E")
 soundsText = Label(root, text="Sound Files").grid(row=2, column=3, sticky="W")
 
-languages = Checkbutton(root, variable=languagesBool).grid(row=3, column=2, sticky="E")
+languages = Checkbutton(root, variable=languagesBool)
+languages.grid(row=3, column=2, sticky="E")
 languagesText = Label(root, text="Lang Files").grid(row=3, column=3, sticky="W")
 
 compatibilityFixes = Checkbutton(root, variable=compatibilityBool)
@@ -276,7 +348,6 @@ zipText = Label(root, text="Zip Files").grid(row=8, column=3, sticky="W")
 
 delete = Checkbutton(root, variable=deleteBool)
 delete.grid(row=9, column=2, sticky="E")
-delete.configure(state="disabled")
 deleteText = Label(root, text="Delete Folder After Zip").grid(row=9, column=3, sticky="W")
 
 clear = Checkbutton(root, variable=clearBool)
@@ -286,7 +357,47 @@ clearText = Label(root, text="Clear Command Line").grid(row=10, column=3, sticky
 ### Bottom
 extractButton = Button(root, text="Extract", command=lambda:extract()).place(relx=1.0, rely=1.0, anchor="se")
 
+loadSettings()
+
+def on_closing():
+	# Saves the last used settings
+	write_config = ConfigParser()
+
+	# The fields on the left.
+	write_config.add_section("Fields")
+	write_config.set("Fields","output_location", outputLocation.get())
+	write_config.set("Fields","name", packName.get())
+	write_config.set("Fields","version", minecraftVersion.get())
+	write_config.set("Fields","snapshot_year", snapshotYear.get())
+	write_config.set("Fields","snapshot_week", snapshotWeek.get())
+	write_config.set("Fields","snapshot_letter", snapshotLetterSelection.get())
+	write_config.set("Fields","png", packPNGSelect.get())
+	write_config.set("Fields","description", description.get())
+	write_config.set("Fields","pack_format", formatChoices.get())
+
+	# The options on the right.
+	write_config.add_section("CheckBoxes")
+	write_config.set("CheckBoxes","snapshot", str(bool(snapshotsBool.get())))
+	write_config.set("CheckBoxes","png", str(bool(packPNGBool.get())))
+	write_config.set("CheckBoxes","auto_pack", str(bool(autoPackBool.get())))
+	write_config.set("CheckBoxes","sounds", str(bool(soundsBool.get())))
+	write_config.set("CheckBoxes","languages", str(bool(languagesBool.get())))
+	write_config.set("CheckBoxes","zip", str(bool(zipBool.get())))
+	write_config.set("CheckBoxes","compatibility", str(bool(compatibilityBool.get())))
+	write_config.set("CheckBoxes","clear", str(bool(clearBool.get())))
+	write_config.set("CheckBoxes","delete", str(bool(deleteBool.get())))
+
+	# Extra settings
+	write_config.add_section("Settings")
+
+	cfgfile = open("settings.ini",'w')
+	write_config.write(cfgfile)
+	cfgfile.close()
+
+	root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
 root.mainloop()
 
-# Stops the menu from opening again
-root.destroy()
+sys.exit(0)
