@@ -29,7 +29,7 @@ Rips all of the assets out of minecraft. This is a **heavly** modified version o
   4. Hit extract.
   5. You resource pack should have been created at the output location.
   
-## How To Compile Program
+## How To Compile the Program
 1. Make sure you have python installed. Install it here: [www.python.org/downloads/](https://www.python.org/downloads/)
 2. Install pyinstaller through powershell:
 ```powershell
