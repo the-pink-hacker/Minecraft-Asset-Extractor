@@ -10,8 +10,9 @@ def extract():
 	packName.get(), # Pack Name
 	minecraftVersion.get(), # Minecraft Version
 	f"{snapshotYear.get()}w{snapshotWeek.get()}{snapshotLetterSelection.get()}", # Snapshot
+	bool(snapshotsBool.get()), # Snapshot bool
 	packPNGSelect.get(), # pack.png
-	packPNGBool.get(), # Custom pack.png
+	bool(packPNGBool.get()), # Custom pack.png
 	description.get(), # Description
 	formatChoices.get(), # Pack Format
 	bool(autoPackBool.get()), # Auto Pack Format
@@ -19,7 +20,8 @@ def extract():
 	bool(languagesBool.get()), # LANG
 	bool(zipBool.get()), # Zip
 	bool(compatibilityBool.get()), # Compatibility
-	bool(clearBool.get())) # Clear command line
+	bool(clearBool.get()), # Clear command line
+	bool(deleteBool.get())) # Delets folder after zipping
 
 def openFolder():
 	folder = filedialog.askdirectory(initialdir=os.path.normpath("C://"), title="Select Output Location")
@@ -35,70 +37,107 @@ def openFile():
 		packPNGSelect.delete(0, END)
 		packPNGSelect.insert(0, folder)
 
+def zipButton():
+	if zipBool.get():
+		delete.configure(state="normal")
+	if not zipBool.get():
+		delete.configure(state="disabled")
+
+def snapshotButton():
+	if snapshotsBool.get():
+		snapshotLetter.configure(state="normal")
+		snapshotWeek.configure(state="normal")
+		snapshotYear.configure(state="normal")
+	elif not snapshotsBool.get():
+		snapshotLetter.configure(state="disabled")
+		snapshotWeek.configure(state="disabled")
+		snapshotYear.configure(state="disabled")
+
 def packFormatButton():
-	if autoPackBool.get() == False:
+	if not autoPackBool.get():
 		packFormat.configure(state="active")
-	elif autoPackBool.get() == True:
+	elif autoPackBool.get():
 		packFormat.configure(state="disabled")
 
 def packPNGButton():
-	if packPNGBool.get() == True:
+	if packPNGBool.get():
 		packPNGSelect.configure(state="normal")
 		packPNGSelectButton.configure(state="normal")
-	elif packPNGBool.get() == False:
+	elif not packPNGBool.get():
 		packPNGSelect.configure(state="disabled")
 		packPNGSelectButton.configure(state="disabled")
 
 def callback(url):
     webbrowser.open_new(url)
 
-def closeCredit(credit):
-	credit.destroy()
+def closeWindow(window):
+	window.destroy()
+	root.focus_force()
 
-def creditUI():
-	credit = Tk()
+def settingsUI():
+	setting = Toplevel(root)
 
-	credit.title("Credit")
-	credit.geometry("400x300")
-	credit.resizable(False, False)
+	setting.focus_force()
+	setting.title("Credit")
+	setting.iconphoto(False, windowIcon)
+	setting.geometry("400x300")
+	setting.resizable(False, False)
 
-	creditTitleText = Label(credit, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
-	creditTitleText.grid(row=0, column=1)
+	settingsTitleText = Label(setting, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
-	creditText = Label(credit, text="Ryan Garret (RyanGar46):")
-	creditText.grid(row=1, column=0, sticky="W")
+	closeButton = Button(setting, text="Close", command=lambda:closeWindow(setting))
+	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 
-	github = Label(credit, text="GitHub", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+def aboutUI():
+
+	about = Toplevel(root)
+
+	about.focus_force()
+	about.title("Credit")
+	about.iconphoto(False, windowIcon)
+	about.geometry("400x300")
+	about.resizable(False, False)
+
+	aboutTitleText = Label(about, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+	aboutTitleText.place(relx=0.5, rely=0.0, anchor="n")
+
+	spacer = Label(about, text="", pady=10).grid(row=0, column=0, sticky="N")
+
+	aboutText = Label(about, text="Ryan Garret (RyanGar46):")
+	aboutText.grid(row=1, column=0, sticky="W")
+
+	github = Label(about, text="GitHub", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	github.grid(row=2, column=0, sticky="W")
 	github.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46"))
 
-	githubProject = Label(credit, text="Minecraft Asset Extractor", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	githubProject = Label(about, text="Minecraft Asset Extractor", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	githubProject.grid(row=3, column=0, sticky="W")
 	githubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
 
-	twitter = Label(credit, text="Twitter", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	twitter = Label(about, text="Twitter", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	twitter.grid(row=4, column=0, sticky="W")
 	twitter.bind("<Button-1>", lambda e: callback("https://twitter.com/RyanGar46"))
 
-	youtube = Label(credit, text="YouTube", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	youtube = Label(about, text="YouTube", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	youtube.grid(row=5, column=0, sticky="W")
 	youtube.bind("<Button-1>", lambda e: callback("https://www.youtube.com/channel/UCa5CoSRScfDUtoEAenjbnZg"))
 
-	curseforge = Label(credit, text="CurseForge", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	curseforge = Label(about, text="CurseForge", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	curseforge.grid(row=6, column=0, sticky="W")
 	curseforge.bind("<Button-1>", lambda e: callback("https://www.curseforge.com/members/ryangar46/projects"))
 
-	planetMC = Label(credit, text="Planet Minecraft", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	planetMC = Label(about, text="Planet Minecraft", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	planetMC.grid(row=7, column=0, sticky="W")
 	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
 
-	version = Label(credit, text="V0.3.0 - Alpha")
+	version = Label(about, text="V0.3.0 - Alpha")
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(credit, text="Close", command=lambda:closeCredit(credit))
+	closeButton = Button(about, text="Close", command=lambda:closeWindow(about))
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 
-	credit.mainloop()
+	about.mainloop()
 
 # Creates the available choices in the pack format drop down.
 packFormats = [
@@ -140,16 +179,21 @@ formatChoices = StringVar(root)
 formatChoices.set(packFormats[5])
 
 # Sets the info about the window.
+root.focus_force()
+windowIcon = PhotoImage(file = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png"))
 root.title("Minecraft Asset Extractor")
-root.iconphoto(False, PhotoImage(file = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")))
+root.iconphoto(False, windowIcon)
 root.resizable(False, False)
 
 # Creating and placing labels.
 titleText = Label(root, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 titleText.place(relx=0.5, rely=0.0, anchor="n")
 
-creditButton = Button(root, text="Credits", command=creditUI)
-creditButton.grid(row=0, column=0, sticky="NW")
+settings = Button(root, text="Settings", command=settingsUI)
+settings.grid(row=0, column=0, sticky=NW)
+
+aboutButton = Button(root, text="About", command=aboutUI)
+aboutButton.place(x=53, y=0, anchor=NW)
 
 outputLocationText = Label(root, text="Output Location:").grid(row=1, column=0, sticky="W")
 outputLocation = Entry(root, width=50)
@@ -172,15 +216,18 @@ snapshotText = Label(root, text="Snapshot Version:").grid(row=7, column=0, stick
 snapshotYearText = Label(root, text="Year:").place(x=0, y=210, anchor=W)
 snapshotYear = Entry(root, width=2)
 snapshotYear.insert(0, str(datetime.today().year)[-2:]) # I don't care that this is more robust than it needs to be.
+snapshotYear.configure(state="disabled")
 snapshotYear.place(x=40, y=210, anchor=W)
 
 snapshotWeekText = Label(root, text="Week:").place(x=60, y=210, anchor=W)
 snapshotWeek = Entry(root, width=2)
 snapshotWeek.insert(0, str(datetime.today().isocalendar()[1]))
+snapshotWeek.configure(state="disabled")
 snapshotWeek.place(x=105, y=210, anchor=W)
 
 snapshotLetterText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
 snapshotLetter = OptionMenu(root, snapshotLetterSelection, *snapshotLetters)
+snapshotLetter.configure(state="disabled")
 snapshotLetter.place(x=130, y=210, anchor=W)
 
 packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=9, column=0, sticky="W")
@@ -210,7 +257,7 @@ compatibilityFixes.grid(row=4, column=2, sticky="E")
 compatibilityFixes.select()
 compatibilityFixesText = Label(root, text="Compatibility Fixes").grid(row=4, column=3, sticky="W")
 
-snapshots = Checkbutton(root, variable=snapshotsBool)
+snapshots = Checkbutton(root, command=snapshotButton, variable=snapshotsBool)
 snapshots.grid(row=5, column=2, sticky="E")
 snapshotsText = Label(root, text="Is a Snapshot").grid(row=5, column=3, sticky="W")
 
@@ -223,12 +270,13 @@ autoPack.grid(row=7, column=2, sticky="E")
 autoPack.select()
 autoPackText = Label(root, text="Auto Pack Format").grid(row=7, column=3, sticky="W")
 
-zip = Checkbutton(root, variable=zipBool)
+zip = Checkbutton(root, command=zipButton, variable=zipBool)
 zip.grid(row=8, column=2, sticky="E")
 zipText = Label(root, text="Zip Files").grid(row=8, column=3, sticky="W")
 
 delete = Checkbutton(root, variable=deleteBool)
 delete.grid(row=9, column=2, sticky="E")
+delete.configure(state="disabled")
 deleteText = Label(root, text="Delete Folder After Zip").grid(row=9, column=3, sticky="W")
 
 clear = Checkbutton(root, variable=clearBool)
@@ -239,3 +287,6 @@ clearText = Label(root, text="Clear Command Line").grid(row=10, column=3, sticky
 extractButton = Button(root, text="Extract", command=lambda:extract()).place(relx=1.0, rely=1.0, anchor="se")
 
 root.mainloop()
+
+# Stops the menu from opening again
+root.destroy()

@@ -8,8 +8,14 @@ def Clear(clear):
 		os.system("cls")
 
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR):
+def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE):
 	Clear(CLEAR)
+
+	MC_VERSION_SNAPSHOT = MC_VERSION
+
+	if SNAPSHOT_BOOL:
+		MC_VERSION_SNAPSHOT = SNAPSHOT
+
 
 	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
@@ -48,10 +54,10 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, PACK_PNG, CUSTOM_PACK_
 	Clear(CLEAR)
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
-		MC_VERSION_JAR = os.path.expandvars("%APPDATA%\\.minecraft\\versions\\" + MC_VERSION + "\\" + MC_VERSION + ".jar")
+		MC_VERSION_JAR = os.path.expandvars(f"%APPDATA%\\.minecraft\\versions\\{MC_VERSION_SNAPSHOT}\\{MC_VERSION_SNAPSHOT}.jar")
 	else:
 		MC_ASSETS = os.path.expanduser("~\\.minecraft\\assets")
-		MC_VERSION_JAR = os.path.expanduser("~\\.minecraft\\versions\\" + MC_VERSION + "\\" + MC_VERSION + ".jar")
+		MC_VERSION_JAR = os.path.expanduser(f"~\\.minecraft\\versions\\{MC_VERSION_SNAPSHOT}\\{MC_VERSION_SNAPSHOT}.jar")
 
 	# Compatibility fixes
 	if COMPATIBILITY == True:
@@ -168,7 +174,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, PACK_PNG, CUSTOM_PACK_
 	print(f"Extracted All Assets To {OUTPUT_PATH}\\{PACK_NAME} ")
 
 	if ZIP_FILES == False:
-		print("Finished. ")
+		print("Finished.")
 	else:
 		Clear(CLEAR)
 
@@ -180,6 +186,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, PACK_PNG, CUSTOM_PACK_
 
 		Clear(CLEAR)
 
-		shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+		if DELETE:
+			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
 
-		print("Finished. ")
+		print("Finished.")
