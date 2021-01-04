@@ -50,6 +50,11 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PN
 	else:
 		LANG = "null"
 
+	REAL_OUTPUT_PATH = OUTPUT_PATH
+
+	if ZIP_FILES == True and DELETE == True:
+		OUTPUT_PATH = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "temp\\")
+
 	# Some of this code works on other operating systems, but I don't think all of it does.
 	Clear(CLEAR)
 	if platform.system() == "Windows":
@@ -178,15 +183,16 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PN
 	else:
 		Clear(CLEAR)
 
-		print(f"Ziping {OUTPUT_PATH}\{PACK_NAME}...")
+		print(f"Ziping {OUTPUT_PATH}\\{PACK_NAME}...")
 
-		shutil.make_archive(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+		shutil.make_archive(os.path.normpath(f"{REAL_OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
 
-		print("Zipped {OUTPUT_PATH}\{PACK_NAME}.")
+		print(f"Zipped {REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")
 
 		Clear(CLEAR)
 
 		if DELETE:
-			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+
+			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
 
 		print("Finished.")
