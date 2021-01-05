@@ -50,7 +50,7 @@
  [],
  False,
  False,
- 1609885725,
+ 1609887358,
  [('run.exe',
    'd:\\porgram '
    'files\\python\\python38\\lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit\\run.exe',

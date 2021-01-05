@@ -572,10 +572,10 @@
   ('tracemalloc',
    'd:\\porgram files\\python\\python38\\lib\\tracemalloc.py',
    'PYMODULE'),
-  ('stringprep',
-   'd:\\porgram files\\python\\python38\\lib\\stringprep.py',
-   'PYMODULE'),
   ('_py_abc',
    'd:\\porgram files\\python\\python38\\lib\\_py_abc.py',
+   'PYMODULE'),
+  ('stringprep',
+   'd:\\porgram files\\python\\python38\\lib\\stringprep.py',
    'PYMODULE'),
   ('GUI', 'D:\\Minecraft-Asset-Extractor\\GUI.py', 'PYMODULE')])
