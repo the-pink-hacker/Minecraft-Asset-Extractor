@@ -10,7 +10,7 @@ Rips all of the assets out of minecraft. This is a **heavly** modified version o
 ### Using the Program
 1. Launch "Minecraft_Asset_Extractor.py" or if you are using V0.3.0+ then open "Minecraft_Asset_Extractor.exe"
 2. Two windows should open: the command line, and the program. If you don't see one of these then make sure it is not minimized.
-3. Fill in the following fields.
+3. Fill in the following fields. You need to have the minecraft version installed on you computer.
    - Output location: Where the final resource pack will be placed (Defaults to desktop).
    - Resource Pack Name: The name of the final resource pack.
    - Minecraft Version: number.number (e.g 1.16, 1.17).
