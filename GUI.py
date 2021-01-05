@@ -268,6 +268,10 @@ def loadSettings():
 		introUI()
 
 def on_closing():
+	saveSettings()
+	root.destroy()
+
+def saveSettings():
 	# Saves the last used settings
 	write_config = ConfigParser()
 
@@ -306,8 +310,6 @@ def on_closing():
 	cfgfile = open("settings.ini",'w')
 	write_config.write(cfgfile)
 	cfgfile.close()
-
-	root.destroy()
 
 # Creates the available choices in the pack format drop down.
 packFormats = [
@@ -476,8 +478,16 @@ def grabSettings(args):
 		except:
 			None
 
+def saveSettingsClock(args):
+	while True:
+		sleep(5)
+		saveSettings()
+
 thread = Thread(target = grabSettings, args = (1,))
 thread.start()
+
+thread2 = Thread(target = saveSettingsClock, args = (1,))
+thread2.start()
 
 root.mainloop()
 
