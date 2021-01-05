@@ -8,6 +8,8 @@ from tkinter import filedialog
 from tkinter import messagebox
 from datetime import datetime
 
+programVersion = "V0.3.0 - Alpha"
+
 def extract():
 	Extract(
 	os.path.normpath(outputLocation.get()), # Output Location
@@ -78,12 +80,37 @@ def closeWindow(window):
 	window.destroy()
 	root.focus_force()
 
+def introUI():
+	global intro
+	intro = Toplevel(root)
+
+	intro.focus_force()
+	intro.title("Introduction Screen")
+	intro.iconphoto(False, windowIcon)
+	intro.geometry("400x300")
+	intro.resizable(False, False)
+
+	settingsTitleText = Label(intro, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
+
+	spacer = Label(intro, text="", pady=10).grid(row=0, column=0, sticky="NW")
+
+	introgithubProject = Label(intro, text="Minecraft Asset Extractor Github Page", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	introgithubProject.place(relx=0.5, rely=0.5, anchor="center")
+	introgithubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
+
+	introVersion = Label(intro, text=programVersion)
+	introVersion.place(relx=0.0, rely=1.0, anchor="sw")
+
+	closeButton = Button(intro, text="Close", command=lambda:closeWindow(intro))
+	closeButton.place(relx=1.0, rely=1.0, anchor="se")
+
 def settingsUI():
 	global setting
 	setting = Toplevel(root)
 
 	setting.focus_force()
-	setting.title("Credit")
+	setting.title("Settings")
 	setting.iconphoto(False, windowIcon)
 	setting.geometry("400x300")
 	setting.resizable(False, False)
@@ -95,7 +122,7 @@ def settingsUI():
 
 	global defaultOutputLocation
 
-	outputLocationText = Label(setting, text="Output Location:").grid(row=1, column=0, sticky="W")
+	outputLocationText = Label(setting, text="Default Output Location:").grid(row=1, column=0, sticky="W")
 	defaultOutputLocation = Entry(setting, width=50)
 	defaultOutputLocation.insert(0, settingsDefaultOutputLocation)
 	defaultOutputLocation.grid(row=2, column=0, sticky="W")
@@ -127,7 +154,7 @@ def aboutUI():
 	github.grid(row=2, column=0, sticky="W")
 	github.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46"))
 
-	githubProject = Label(about, text="Minecraft Asset Extractor", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	githubProject = Label(about, text="Minecraft Asset Extractor Github Page", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	githubProject.grid(row=3, column=0, sticky="W")
 	githubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
 
@@ -147,7 +174,7 @@ def aboutUI():
 	planetMC.grid(row=7, column=0, sticky="W")
 	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
 
-	version = Label(about, text="V0.3.0 - Alpha")
+	version = Label(about, text=programVersion)
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
 	closeButton = Button(about, text="Close", command=lambda:closeWindow(about))
@@ -235,7 +262,10 @@ def loadSettings():
 	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
 		settingsDefaultOutputLocation = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 	else:
-		outputLocation.insert(0, read_config.get("Fields", "output_location"))
+		settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
+
+	if read_config.get("Settings", "intro_screen") == "True":
+		introUI()
 
 def on_closing():
 	# Saves the last used settings
@@ -267,7 +297,11 @@ def on_closing():
 
 	# Extra settings
 	write_config.add_section("Settings")
-	write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
+	try:
+		write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
+	except:
+		write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
+	write_config.set("Settings","intro_screen", "False")
 
 	cfgfile = open("settings.ini",'w')
 	write_config.write(cfgfile)
@@ -331,6 +365,9 @@ settings.grid(row=0, column=0, sticky=NW)
 
 aboutButton = Button(root, text="About", command=aboutUI)
 aboutButton.place(x=53, y=0, anchor=NW)
+
+introButton = Button(root, text="Intro Screen", command=introUI)
+introButton.place(x=97, y=0, anchor=NW)
 
 outputLocationText = Label(root, text="Output Location:").grid(row=1, column=0, sticky="W")
 outputLocation = Entry(root, width=50)
@@ -436,7 +473,6 @@ def grabSettings(args):
 		try:
 			global settingsDefaultOutputLocation
 			settingsDefaultOutputLocation = defaultOutputLocation.get()
-			print(settingsDefaultOutputLocation)
 		except:
 			None
 
