@@ -8,30 +8,36 @@ def Clear(clear):
 		os.system("cls")
 
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR):
+def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE):
 	Clear(CLEAR)
+
+	MC_VERSION_SNAPSHOT = MC_VERSION
+
+	if SNAPSHOT_BOOL:
+		MC_VERSION_SNAPSHOT = SNAPSHOT
+
 
 	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
 		if int(MC_VERSION.split(".")[1]) >= 17:
 			MC_PACK = 7
 		elif int(MC_VERSION.split(".")[1]) == 16:
-			if int(MC_VERSION_FULL.split(".")[2]) >= 2:
+			if int(MC_VERSION.split(".")[2]) >= 2:
 				MC_PACK = 6
 			else:
 				MC_PACK = 5
-		elif int(MC_VERSION.split(".")[1]) == 15:
+		elif int(MC_VERSION.split(".")[1]) >= 15:
 			MC_PACK = 5
-		elif int(MC_VERSION.split(".")[1]) == 15:
-			MC_PACK = 5
-		elif int(MC_VERSION.split(".")[1]) == 13:
+		elif int(MC_VERSION.split(".")[1]) >= 13:
 			MC_PACK = 4
-		elif int(MC_VERSION.split(".")[1]) == 11:
+		elif int(MC_VERSION.split(".")[1]) >= 11:
 			MC_PACK = 3
-		elif int(MC_VERSION.split(".")[1]) == 9:
+		elif int(MC_VERSION.split(".")[1]) >= 9:
 			MC_PACK = 2
-		elif int(MC_VERSION.split(".")[1]) == 8:
-			if int(MC_VERSION_FULL.split(".")[2]) == 1:
+		elif int(MC_VERSION.split(".")[1]) >= 7:
+			MC_PACK = 1
+		elif int(MC_VERSION.split(".")[1]) >= 6:
+			if int(MC_VERSION.split(".")[2]) == 1:
 				MC_PACK = 1
 
 	if SOUNDS == True:
@@ -44,25 +50,32 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, CUSTO
 	else:
 		LANG = "null"
 
+	REAL_OUTPUT_PATH = OUTPUT_PATH
+
+	if ZIP_FILES == True and DELETE == True:
+		OUTPUT_PATH = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "temp\\")
+
 	# Some of this code works on other operating systems, but I don't think all of it does.
 	Clear(CLEAR)
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
-		MC_VERSION_JAR = os.path.expandvars("%APPDATA%\\.minecraft\\versions\\" + MC_VERSION_FULL + "\\" + MC_VERSION_FULL + ".jar")
+		MC_VERSION_JAR = os.path.expandvars(f"%APPDATA%\\.minecraft\\versions\\{MC_VERSION_SNAPSHOT}\\{MC_VERSION_SNAPSHOT}.jar")
 	else:
 		MC_ASSETS = os.path.expanduser("~\\.minecraft\\assets")
-		MC_VERSION_JAR = os.path.expanduser("~\\.minecraft\\versions\\" + MC_VERSION_FULL + "\\" + MC_VERSION_FULL + ".jar")
+		MC_VERSION_JAR = os.path.expanduser(f"~\\.minecraft\\versions\\{MC_VERSION_SNAPSHOT}\\{MC_VERSION_SNAPSHOT}.jar")
 
 	# Compatibility fixes
 	if COMPATIBILITY == True:
 		if int(MC_VERSION.split(".")[1]) == 13:
 			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/1.13.1.json"
 		elif int(MC_VERSION.split(".")[1]) >= 8:
-			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/{MC_VERSION}.json"
+			MC_OBJECT_INDEX = f"""{MC_ASSETS}/indexes/{MC_VERSION.split(".")[0]}.{MC_VERSION.split(".")[1]}.json"""
 		elif int(MC_VERSION.split(".")[1]) == 7:
-			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/{MC_VERSION_FULL}.json"
+			MC_OBJECT_INDEX = f"""{MC_ASSETS}/indexes/{MC_VERSION}.json"""
 		else:
 			MC_OBJECT_INDEX = f"{MC_ASSETS}/indexes/legacy.json"
+	else:
+		MC_OBJECT_INDEX = f"""{MC_ASSETS}/indexes/{MC_VERSION.split(".")[0]}.{MC_VERSION.split(".")[1]}.json"""
 
 	# Where the unextracted asset files are.
 	MC_OBJECTS_PATH = f"{MC_ASSETS}/objects"
@@ -141,7 +154,7 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, CUSTO
 					# Copy the file
 					shutil.copyfile(src_fpath, dest_fpath)
 
-	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or CUSTOM_PACK_PNG.replace(" ", "") == "":
+	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
 		PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
 	
 	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}"), exist_ok=True)
@@ -166,18 +179,20 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, MC_VERSION_FULL, PACK_PNG, CUSTO
 	print(f"Extracted All Assets To {OUTPUT_PATH}\\{PACK_NAME} ")
 
 	if ZIP_FILES == False:
-		print("Finished. ")
+		print("Finished.")
 	else:
 		Clear(CLEAR)
 
-		print(f"Ziping {OUTPUT_PATH}\{PACK_NAME}...")
+		print(f"Ziping {OUTPUT_PATH}\\{PACK_NAME}...")
 
-		shutil.make_archive(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+		shutil.make_archive(os.path.normpath(f"{REAL_OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
 
-		print("Zipped {OUTPUT_PATH}\{PACK_NAME}.")
+		print(f"Zipped {REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")
 
 		Clear(CLEAR)
 
-		shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+		if DELETE:
 
-		print("Finished. ")
+			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
+
+		print("Finished.")
