@@ -1,6 +1,8 @@
 # Minecraft Asset Extractor
 Rips all of the assets out of minecraft. This is a **heavly** modified version of [minecraft.gamepedia.com/Tutorials/Sound_directory](https://minecraft.gamepedia.com/Tutorials/Sound_directory).
 
+This only works on windows 10. You can compile it for your OS. [How to Compile](#how-to-compile-the-program).
+
 ## How To Use
 ### Downloading and Installing
 1. Download [latest version](https://github.com/RyanGar46/Minecraft-Asset-Extractor/releases/latest) (Does **not** need python).
@@ -44,10 +46,6 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
   - ~~Add more comments to the code.~~
   - ~~Clean up varible names.~~
 - Make sure that it is compatible with every MC version.
-- OS compatibility
-  - ~~Windows (Only OS I have access to)~~
-  - Linux
-  - Mac
 - Make sure that it is user friendly.
   - ~~GUI~~
   - ~~Intro Page~~
