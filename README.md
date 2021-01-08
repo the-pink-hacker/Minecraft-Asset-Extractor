@@ -38,7 +38,7 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
   - ~~Intro Page~~
   - Tutorial Video
   - ~~Saving last used settings.~~
-- Pack into an .exe.
+- ~~Pack into an .exe.~~
 - Multithreading
 - Settings
    - ~~Default output location.~~
@@ -46,6 +46,6 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
    - Into page on start up.
 
 # Extra Features
-Extra things that I want to add at some point:
+Extra things that I might want to add at some point:
 - Dark mode.
 - Full screen compatibility.
