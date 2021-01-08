@@ -8,7 +8,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from datetime import datetime
 
-programVersion = "V0.4.0 - Beta5"
+programVersion = "V0.4.0 - Beta"
 
 def extract():
 	ExtractStart(
