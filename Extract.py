@@ -1,14 +1,58 @@
 import json, os, platform, shutil, sys
 from zipfile import ZipFile
 from pathlib import Path
+from threading import Thread
 import array as arr
+
+OUTPUT_PATH = ""
+PACK_NAME = ""
+MC_VERSION = ""
+SNAPSHOT = ""
+SNAPSHOT_BOOL = False
+PACK_PNG = ""
+CUSTOM_PACK_PNG = False
+DESCRIPTION = ""
+MC_PACK = ""
+AUTO_PACK = False
+SOUNDS = False
+LANGBOOL = False
+ZIP_FILES = False
+COMPATIBILITY = False
+CLEAR = False
+DELETE = False
 
 def Clear(clear):
 	if clear == True:
 		os.system("cls")
 
+def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, zipFiles, compatibility, clear, delete):
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+
+	OUTPUT_PATH = outPath
+	PACK_NAME = packName
+	MC_VERSION = version
+	SNAPSHOT = snapshot
+	SNAPSHOT_BOOL = snapshotBool
+	PACK_PNG = packPNG
+	CUSTOM_PACK_PNG = customPackPNG
+	DESCRIPTION = Description
+	MC_PACK = pack
+	AUTO_PACK = autoPack
+	SOUNDS = sounds
+	LANGBOOL = langBool
+	ZIP_FILES = zipFiles
+	COMPATIBILITY = compatibility
+	CLEAR = clear
+	DELETE = delete
+
+	thread = Thread(target = Extract, args = (2,))
+	thread.start()
+	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE):
+def Extract(args):
+
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+
 	Clear(CLEAR)
 
 	MC_VERSION_SNAPSHOT = MC_VERSION

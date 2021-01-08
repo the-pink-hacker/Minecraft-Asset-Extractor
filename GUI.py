@@ -8,10 +8,10 @@ from tkinter import filedialog
 from tkinter import messagebox
 from datetime import datetime
 
-programVersion = "V0.3.0 - Alpha"
+programVersion = "V0.4.0 - Beta5"
 
 def extract():
-	Extract(
+	ExtractStart(
 	os.path.normpath(outputLocation.get()), # Output Location
 	packName.get(), # Pack Name
 	minecraftVersion.get(), # Minecraft Version
@@ -263,6 +263,8 @@ def loadSettings():
 		settingsDefaultOutputLocation = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 	else:
 		settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
+		outputLocation.delete(0, END)
+		outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
 
 	if read_config.get("Settings", "intro_screen") == "True":
 		introUI()
@@ -481,7 +483,10 @@ def grabSettings(args):
 def saveSettingsClock(args):
 	while True:
 		sleep(5)
-		saveSettings()
+		try:
+			saveSettings()
+		except:
+			None
 
 thread = Thread(target = grabSettings, args = (1,))
 thread.start()
