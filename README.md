@@ -42,8 +42,6 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
 - Multithreading
 - Settings
    - ~~Default output location.~~
-   - Use last used settings.
-   - Into page on start up.
 
 # Extra Features
 Extra things that I might want to add at some point:
