@@ -1,14 +1,73 @@
-import json, os, platform, shutil, sys
+import json, os, platform, shutil, sys, multiprocessing, time
 from zipfile import ZipFile
 from pathlib import Path
+from threading import Thread
 import array as arr
+
+OUTPUT_PATH = ""
+PACK_NAME = ""
+MC_VERSION = ""
+SNAPSHOT = ""
+SNAPSHOT_BOOL = False
+PACK_PNG = ""
+CUSTOM_PACK_PNG = False
+DESCRIPTION = ""
+MC_PACK = ""
+AUTO_PACK = False
+SOUNDS = False
+LANGBOOL = False
+ZIP_FILES = False
+COMPATIBILITY = False
+CLEAR = False
+DELETE = False
+
+completed = 0
 
 def Clear(clear):
 	if clear == True:
 		os.system("cls")
 
+def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, zipFiles, compatibility, clear, delete):
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+
+	OUTPUT_PATH = outPath
+	PACK_NAME = packName
+	MC_VERSION = version
+	SNAPSHOT = snapshot
+	SNAPSHOT_BOOL = snapshotBool
+	PACK_PNG = packPNG
+	CUSTOM_PACK_PNG = customPackPNG
+	DESCRIPTION = Description
+	MC_PACK = pack
+	AUTO_PACK = autoPack
+	SOUNDS = sounds
+	LANGBOOL = langBool
+	ZIP_FILES = zipFiles
+	COMPATIBILITY = compatibility
+	CLEAR = clear
+	DELETE = delete
+
+	thread = Thread(target = Extract, args = (0,))
+	thread.start()
+
+def ExtractOBJ(args, src, dest):
+	os.makedirs(os.path.dirname(dest), exist_ok=True)
+	shutil.copyfile(src, dest)
+
+def ExtractJAR(args, zip, file):
+	global completed
+	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}\\{file}"), exist_ok=True)
+	try:
+		zip.extract(file, os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
+	except:
+		None
+	completed += 1
+	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
-def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE):
+def Extract(args):
+
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+
 	Clear(CLEAR)
 
 	MC_VERSION_SNAPSHOT = MC_VERSION
@@ -55,7 +114,6 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PN
 	if ZIP_FILES == True and DELETE == True:
 		OUTPUT_PATH = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "temp\\")
 
-	# Some of this code works on other operating systems, but I don't think all of it does.
 	Clear(CLEAR)
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
@@ -92,67 +150,93 @@ def Extract(OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PN
 		length = 0
 		current = 0
 
-		print("Extracting .rar")
-
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				length += 1
+				if len(fileName.split("/")) >= 6:
+					if fileName.split("/")[5] != "background":
+						length += 1
+				else:
+					length += 1
+
+		global completed
 
 		# Iterate over the file names
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				current += 1
-				print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
-				zip.extract(fileName, os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
+				if len(fileName.split("/")) >= 6:
+					if fileName.split("/")[5] != "background":
+						current += 1
+						print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
+						
+						# finds out what thread to use.
+						currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+
+						# Copy the file
+						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
+						threadJAR.start()
+				else:
+					current += 1
+					print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
+						
+					# finds out what thread to use.
+					currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+
+					# Copy the file
+					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
+					threadJAR.start()
+
+		while completed != current:
+			time.sleep(0.1)
 
 	if os.path.exists(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}\\assets\\.mcassetsroot")):
 		os.remove(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}\\assets\\.mcassetsroot"))
 
 	Clear(CLEAR)
 
-	if SOUNDS or LANGBOOL:
-		# Handles files that are not in .jar
-		with open(MC_OBJECT_INDEX, "r") as read_file:
-			# Parse the JSON file into a dictionary
-			data = json.load(read_file)
+	# Handles files that are not in .jar
+	with open(MC_OBJECT_INDEX, "r") as read_file:
+		# Parse the JSON file into a dictionary
+		data = json.load(read_file)
 
-			# Find each line with MC_SOUNDS prefix, remove the prefix and keep the rest of the path and the hash
-			sounds = {k[len(MC_SOUNDS):] : v["hash"] for (k,v) in data["objects"].items() if k.startswith(MC_SOUNDS)}
+		# Find each line with MC_SOUNDS prefix, remove the prefix and keep the rest of the path and the hash
+		sounds = {k[len(MC_SOUNDS):] : v["hash"] for (k,v) in data["objects"].items() if k.startswith(MC_SOUNDS)}
 
-			length = 0
-			current = 0
+		length = 0
+		current = 0
 
-			if SOUNDS and LANGBOOL:
-				print("Extracting Sounds And Languages.")
-			elif not SOUNDS and LANGBOOL:
-				print("Extracting Languages.")
-			elif SOUNDS and not LANGBOOL:
-				print("Extracting Sounds.")
+		if SOUNDS and LANGBOOL:
+			print("Extracting Sounds And Languages.")
+		elif not SOUNDS and LANGBOOL:
+			print("Extracting Languages.")
+		elif SOUNDS and not LANGBOOL:
+			print("Extracting Sounds.")
 
-			for fpath, fhash in sounds.items():
-				if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
-					length += 1
+		for fpath, fhash in sounds.items():
+			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+				length += 1
 
-			for fpath, fhash in sounds.items():
-				if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
-					current += 1
+		for fpath, fhash in sounds.items():
+			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+				current += 1
 
-					if SOUNDS and LANGBOOL:
-						print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
-					elif not SOUNDS and LANGBOOL:
-						print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
-					elif SOUNDS and not LANGBOOL:
-						print("Extracting Sounds Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+				if SOUNDS and LANGBOOL:
+					print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+				elif not SOUNDS and LANGBOOL:
+					print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+				elif SOUNDS and not LANGBOOL:
+					print("Extracting Sounds Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
 
-					# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
-					src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
-					dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
-					#print(fpath)
-					# Make any directories needed to put the output file into as Python expects
-					os.makedirs(os.path.dirname(dest_fpath), exist_ok=True)
+				# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
+				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
+				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
+				#print(fpath)
 
-					# Copy the file
-					shutil.copyfile(src_fpath, dest_fpath)
+				# finds out what thread to use.
+				currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+
+				# Copy the file
+				threadOBJ = Thread(target = ExtractOBJ, args = (currentThread, src_fpath, dest_fpath))
+				threadOBJ.start()
 
 	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
 		PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
