@@ -1,4 +1,4 @@
-import json, os, platform, shutil, sys, multiprocessing
+import json, os, platform, shutil, sys, multiprocessing, time
 from zipfile import ZipFile
 from pathlib import Path
 from threading import Thread
@@ -20,6 +20,8 @@ ZIP_FILES = False
 COMPATIBILITY = False
 CLEAR = False
 DELETE = False
+
+completed = 0
 
 def Clear(clear):
 	if clear == True:
@@ -49,13 +51,17 @@ def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, cu
 	thread.start()
 
 def ExtractOBJ(args, src, dest):
+	os.makedirs(os.path.dirname(dest), exist_ok=True)
 	shutil.copyfile(src, dest)
 
 def ExtractJAR(args, zip, file):
+	global completed
+	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}\\{file}"), exist_ok=True)
 	try:
 		zip.extract(file, os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
 	except:
-		print(f"Failed to extract {file} on thread {args}")
+		None
+	completed += 1
 	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 def Extract(args):
@@ -108,7 +114,6 @@ def Extract(args):
 	if ZIP_FILES == True and DELETE == True:
 		OUTPUT_PATH = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "temp\\")
 
-	# Some of this code works on other operating systems, but I don't think all of it does.
 	Clear(CLEAR)
 	if platform.system() == "Windows":
 		MC_ASSETS = os.path.expandvars("%APPDATA%\\.minecraft\\assets")
@@ -147,16 +152,18 @@ def Extract(args):
 
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				try:
+				if len(fileName.split("/")) >= 6:
 					if fileName.split("/")[5] != "background":
 						length += 1
-				except:
+				else:
 					length += 1
+
+		global completed
 
 		# Iterate over the file names
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				try:
+				if len(fileName.split("/")) >= 6:
 					if fileName.split("/")[5] != "background":
 						current += 1
 						print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
@@ -167,16 +174,19 @@ def Extract(args):
 						# Copy the file
 						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
 						threadJAR.start()
-				except:
+				else:
 					current += 1
 					print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
-					
+						
 					# finds out what thread to use.
 					currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
 
 					# Copy the file
 					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
 					threadJAR.start()
+
+		while completed != current:
+			time.sleep(0.1)
 
 	if os.path.exists(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}\\assets\\.mcassetsroot")):
 		os.remove(os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}\\assets\\.mcassetsroot"))
@@ -220,8 +230,6 @@ def Extract(args):
 				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
 				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
 				#print(fpath)
-				# Make any directories needed to put the output file into as Python expects
-				os.makedirs(os.path.dirname(dest_fpath), exist_ok=True)
 
 				# finds out what thread to use.
 				currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
