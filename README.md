@@ -14,8 +14,6 @@ Select what type of version in the text box. (ex. 1.8.9)
 Click Extract and wait! It may say that it will not respond because the command prompt is currently extracting the files.
 ## Step 5
 Close the window, and enjoy your fully extracted resource pack!
-
-(Note. This is a document. I will make a tutorial video soon.)
   
 # How To Compile the Program
 1. Make sure you have python installed. Install it here: [www.python.org/downloads/](https://www.python.org/downloads/)
@@ -39,8 +37,8 @@ This is currently in aphal and still needs a lot of work to be done. Some of the
   - Tutorial Video
   - ~~Saving last used settings.~~
 - ~~Pack into an .exe.~~
-- Multithreading
-- Settings
+- ~~Multithreading~~
+- ~~Settings~~
    - ~~Default output location.~~
 
 # Extra Features
