@@ -5,10 +5,9 @@ from configparser import *
 from Extract import *
 from tkinter import *
 from tkinter import filedialog
-from tkinter import messagebox
 from datetime import datetime
 
-programVersion = "V0.4.0 - Beta"
+programVersion = "V0.5.0 - Beta"
 
 def extract():
 	ExtractStart(
@@ -128,6 +127,9 @@ def settingsUI():
 	defaultOutputLocation.grid(row=2, column=0, sticky="W")
 	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation))
 	outputLocationButton.grid(row=2, column=1)
+
+	settingsVersion = Label(setting, text=programVersion)
+	settingsVersion.place(relx=0.0, rely=1.0, anchor="sw")
 
 	closeButton = Button(setting, text="Close", command=lambda:closeWindow(setting))
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
@@ -357,7 +359,7 @@ root.focus_force()
 windowIcon = PhotoImage(file = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png"))
 root.title("Minecraft Asset Extractor")
 root.iconphoto(False, windowIcon)
-root.resizable(False, False)
+root.minsize(550, 375)
 
 ### Feilds
 # region
