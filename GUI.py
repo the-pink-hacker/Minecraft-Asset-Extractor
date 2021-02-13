@@ -9,6 +9,8 @@ from datetime import datetime
 
 programVersion = "V0.5.0 - Beta"
 
+desktopDir = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
+
 def convertToRGB(rgb):
 	"""translates an rgb tuple of int to a tkinter friendly color code
 	"""
@@ -369,7 +371,7 @@ formatChoices.set(packFormats[5])
 
 # Sets the info about the window.
 root.focus_force()
-windowIcon = PhotoImage(file = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png"))
+windowIcon = PhotoImage(file = "pack.png")
 root.title("Minecraft Asset Extractor")
 root.iconphoto(False, windowIcon)
 root.minsize(550, 375)
@@ -396,7 +398,7 @@ introButton.bind("<Leave>", onLeave)
 
 outputLocationText = Label(root, text="Output Location:").grid(row=1, column=0, sticky="W")
 outputLocation = Entry(root, width=50)
-outputLocation.insert(0, os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/"))))
+outputLocation.insert(0, desktopDir)
 outputLocation.grid(row=2, column=0, sticky="W")
 outputLocationButton = Button(root, text="Select Folder", command=lambda:openFolder(root, outputLocation), borderwidth=0)
 outputLocationButton.grid(row=2, column=1)
@@ -414,19 +416,19 @@ minecraftVersion.grid(row=6, column=0, sticky="W")
 
 snapshotText = Label(root, text="Snapshot Version:").grid(row=7, column=0, sticky="W")
 
-snapshotYearText = Label(root, text="Year:").place(x=0, y=210, anchor=W)
+snapshotYearText = Label(root, text="Year:").place(x=0, y=205, anchor=W)
 snapshotYear = Entry(root, width=2)
 snapshotYear.insert(0, str(datetime.today().year)[-2:]) # I don't care that this is more robust than it needs to be.
-snapshotYear.place(x=40, y=210, anchor=W)
+snapshotYear.place(x=40, y=205, anchor=W)
 
-snapshotWeekText = Label(root, text="Week:").place(x=60, y=210, anchor=W)
+snapshotWeekText = Label(root, text="Week:").place(x=60, y=205, anchor=W)
 snapshotWeek = Entry(root, width=2)
 snapshotWeek.insert(0, str(datetime.today().isocalendar()[1]))
-snapshotWeek.place(x=105, y=210, anchor=W)
+snapshotWeek.place(x=105, y=205, anchor=W)
 
-snapshotLetterText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
+snapshotLetterText = Label(root, text="Letter:").place(x=125, y=205, anchor=W)
 snapshotLetter = OptionMenu(root, snapshotLetterSelection, *snapshotLetters)
-snapshotLetter.place(x=130, y=210, anchor=W)
+snapshotLetter.place(x=165, y=205, anchor=W)
 
 packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=9, column=0, sticky="W")
 packPNGSelect = Entry(root, width=50)
@@ -447,43 +449,32 @@ packFormat.grid(row=14, column=0, sticky="W")
 
 ### Options
 # region
-sounds = Checkbutton(root, variable=soundsBool)
-sounds.grid(row=2, column=2, sticky="E")
-soundsText = Label(root, text="Sound Files").grid(row=2, column=3, sticky="W")
+sounds = Checkbutton(root, variable=soundsBool, text="Sound Files")
+sounds.grid(row=2, column=2, sticky="W")
 
-languages = Checkbutton(root, variable=languagesBool)
-languages.grid(row=3, column=2, sticky="E")
-languagesText = Label(root, text="Lang Files").grid(row=3, column=3, sticky="W")
+languages = Checkbutton(root, variable=languagesBool, text="Lang Files")
+languages.grid(row=3, column=2, sticky="W")
 
-compatibilityFixes = Checkbutton(root, variable=compatibilityBool)
-compatibilityFixes.grid(row=4, column=2, sticky="E")
-compatibilityFixes.select()
-compatibilityFixesText = Label(root, text="Compatibility Fixes").grid(row=4, column=3, sticky="W")
+compatibilityFixes = Checkbutton(root, variable=compatibilityBool, text="Compatibility Fixes")
+compatibilityFixes.grid(row=4, column=2, sticky="W")
 
-snapshots = Checkbutton(root, command=snapshotButton, variable=snapshotsBool)
-snapshots.grid(row=5, column=2, sticky="E")
-snapshotsText = Label(root, text="Is a Snapshot").grid(row=5, column=3, sticky="W")
+snapshots = Checkbutton(root, command=snapshotButton, variable=snapshotsBool, text="Is a Snapshot")
+snapshots.grid(row=5, column=2, sticky="W")
 
-packPNG = Checkbutton(root, command=packPNGButton, variable=packPNGBool)
-packPNG.grid(row=6, column=2, sticky="E")
-packPNGText = Label(root, text="Custom Pack Image").grid(row=6, column=3, sticky="W")
+packPNG = Checkbutton(root, command=packPNGButton, variable=packPNGBool, text="Custom Pack Image")
+packPNG.grid(row=6, column=2, sticky="W")
 
-autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool)
-autoPack.grid(row=7, column=2, sticky="E")
-autoPack.select()
-autoPackText = Label(root, text="Auto Pack Format").grid(row=7, column=3, sticky="W")
+autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool, text="Auto Pack Format")
+autoPack.grid(row=7, column=2, sticky="W")
 
-zip = Checkbutton(root, command=zipButton, variable=zipBool)
-zip.grid(row=8, column=2, sticky="E")
-zipText = Label(root, text="Zip Files").grid(row=8, column=3, sticky="W")
+zip = Checkbutton(root, command=zipButton, variable=zipBool, text="Zip Files")
+zip.grid(row=8, column=2, sticky="W")
 
-delete = Checkbutton(root, variable=deleteBool)
-delete.grid(row=9, column=2, sticky="E")
-deleteText = Label(root, text="Delete Folder After Zip").grid(row=9, column=3, sticky="W")
+delete = Checkbutton(root, variable=deleteBool, text="Delete Folder After Zip")
+delete.grid(row=9, column=2, sticky="W")
 
-clear = Checkbutton(root, variable=clearBool)
-clear.grid(row=10, column=2, sticky="E")
-clearText = Label(root, text="Clear Command Line").grid(row=10, column=3, sticky="W")
+clear = Checkbutton(root, variable=clearBool, text="Clear Command Line")
+clear.grid(row=10, column=2, sticky="W")
 # endregion Options
 
 ### Bottom
