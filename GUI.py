@@ -261,7 +261,7 @@ def loadSettings():
 	# The fields on the left.
 	outputLocation.delete(0, END)
 	if read_config.get("Fields", "output_location").replace(" ", "") == "":
-		outputLocation.insert(0, os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/"))))
+		outputLocation.insert(0, desktopDir)
 	else:
 		outputLocation.insert(0, read_config.get("Fields", "output_location"))
 	packName.delete(0, END)
@@ -280,7 +280,7 @@ def loadSettings():
 	# Settings
 	global settingsDefaultOutputLocation
 	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
-		settingsDefaultOutputLocation = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
+		settingsDefaultOutputLocation = desktopDir
 	else:
 		settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
 		outputLocation.delete(0, END)
@@ -299,7 +299,10 @@ def saveSettings():
 
 	# The fields on the left.
 	write_config.add_section("Fields")
-	write_config.set("Fields","output_location", outputLocation.get())
+	if outputLocation.get() != settingsDefaultOutputLocation:
+		write_config.set("Fields","output_location", outputLocation.get())
+	else:
+		write_config.set("Fields","output_location", "")
 	write_config.set("Fields","name", packName.get())
 	write_config.set("Fields","version", minecraftVersion.get())
 	write_config.set("Fields","png", packPNGSelect.get())
@@ -320,10 +323,10 @@ def saveSettings():
 
 	# Extra settings
 	write_config.add_section("Settings")
-	try:
+	if settingsDefaultOutputLocation != desktopDir:
 		write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
-	except:
-		write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
+	else:
+		write_config.set("Settings","default_output_location", "")
 	write_config.set("Settings","intro_screen", "False")
 
 	cfgfile = open("settings.ini",'w')
