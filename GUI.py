@@ -95,7 +95,6 @@ def closeWindow(window):
 	root.focus_force()
 
 def introUI():
-	global intro
 	intro = Toplevel(root)
 
 	intro.focus_force()
@@ -116,13 +115,12 @@ def introUI():
 	introVersion = Label(intro, text=programVersion)
 	introVersion.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(intro, text="Close", command=lambda:closeWindow(intro), borderwidth=0)
+	closeButton = Button(intro, text="Close", command=lambda:closeWindow(intro), relief="flat")
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
 
 def settingsUI():
-	global setting
 	setting = Toplevel(root)
 
 	setting.focus_force()
@@ -142,7 +140,7 @@ def settingsUI():
 	defaultOutputLocation = Entry(setting, width=50)
 	defaultOutputLocation.insert(0, settingsDefaultOutputLocation)
 	defaultOutputLocation.grid(row=2, column=0, sticky="W")
-	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation), borderwidth=0)
+	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation), relief="flat")
 	outputLocationButton.grid(row=2, column=1)
 	outputLocationButton.bind("<Enter>", onEnter)
 	outputLocationButton.bind("<Leave>", onLeave)
@@ -150,13 +148,12 @@ def settingsUI():
 	settingsVersion = Label(setting, text=programVersion)
 	settingsVersion.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(setting, text="Close", command=lambda:closeWindow(setting), borderwidth=0)
+	closeButton = Button(setting, text="Close", command=lambda:closeWindow(setting), relief="flat")
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
 
 def aboutUI():
-
 	about = Toplevel(root)
 
 	about.focus_force()
@@ -200,7 +197,7 @@ def aboutUI():
 	version = Label(about, text=programVersion)
 	version.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(about, text="Close", command=lambda:closeWindow(about), borderwidth=0)
+	closeButton = Button(about, text="Close", command=lambda:closeWindow(about), relief="flat")
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
@@ -384,17 +381,17 @@ root.minsize(550, 375)
 titleText = Label(root, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 titleText.place(relx=0.5, rely=0.0, anchor="n")
 
-settings = Button(root, text="Settings", command=settingsUI, borderwidth=0)
+settings = Button(root, text="Settings", command=settingsUI, relief="flat")
 settings.grid(row=0, column=0, sticky=NW)
 settings.bind("<Enter>", onEnter)
 settings.bind("<Leave>", onLeave)
 
-aboutButton = Button(root, text="About", command=aboutUI, borderwidth=0)
+aboutButton = Button(root, text="About", command=aboutUI, relief="flat")
 aboutButton.place(x=50, y=0, anchor=NW)
 aboutButton.bind("<Enter>", onEnter)
 aboutButton.bind("<Leave>", onLeave)
 
-introButton = Button(root, text="Intro Screen", command=introUI, borderwidth=0)
+introButton = Button(root, text="Intro Screen", command=introUI, relief="flat")
 introButton.place(x=91, y=0, anchor=NW)
 introButton.bind("<Enter>", onEnter)
 introButton.bind("<Leave>", onLeave)
@@ -403,7 +400,7 @@ outputLocationText = Label(root, text="Output Location:").grid(row=1, column=0, 
 outputLocation = Entry(root, width=50)
 outputLocation.insert(0, desktopDir)
 outputLocation.grid(row=2, column=0, sticky="W")
-outputLocationButton = Button(root, text="Select Folder", command=lambda:openFolder(root, outputLocation), borderwidth=0)
+outputLocationButton = Button(root, text="Select Folder", command=lambda:openFolder(root, outputLocation), relief="flat")
 outputLocationButton.grid(row=2, column=1)
 outputLocationButton.bind("<Enter>", onEnter)
 outputLocationButton.bind("<Leave>", onLeave)
@@ -436,7 +433,7 @@ snapshotLetter.place(x=165, y=205, anchor=W)
 packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=9, column=0, sticky="W")
 packPNGSelect = Entry(root, width=50)
 packPNGSelect.grid(row=10, column=0, sticky="W")
-packPNGSelectButton = Button(root, text="Select File", command=openFile, state="disabled", borderwidth=0)
+packPNGSelectButton = Button(root, text="Select File", command=openFile, state="disabled", relief="flat")
 packPNGSelectButton.grid(row=10, column=1)
 packPNGSelectButton.bind("<Enter>", onEnter)
 packPNGSelectButton.bind("<Leave>", onLeave)
@@ -482,7 +479,7 @@ clear.grid(row=10, column=2, sticky="W")
 
 ### Bottom
 # region
-extractButton = Button(root, text="Extract", command=lambda:extract(), borderwidth=0)
+extractButton = Button(root, text="Extract", command=lambda:extract(), relief="flat")
 extractButton.place(relx=1.0, rely=1.0, anchor="se")
 extractButton.bind("<Enter>", onEnter)
 extractButton.bind("<Leave>", onLeave)
