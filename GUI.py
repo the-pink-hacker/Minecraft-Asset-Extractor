@@ -11,15 +11,16 @@ programVersion = "V0.5.0 - Beta"
 
 desktopDir = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
-def convertToRGB(rgb):
-	"""translates an rgb tuple of int to a tkinter friendly color code
+settingsDefaultOutputLocation = desktopDir
+
+def convertToRGB(r, g, b):
+	"""translates rgb to a tkinter friendly color code
 	"""
-	r, g, b = rgb
 	return f"#{r:02x}{g:02x}{b:02x}"
 
 def onEnter(e):
 	if e.widget["state"] == NORMAL:
-		e.widget["background"] = convertToRGB((220, 220, 220))
+		e.widget["background"] = convertToRGB(220, 220, 220)
 
 def onLeave(e):
     e.widget["background"] = "SystemButtonFace"
@@ -205,86 +206,167 @@ def aboutUI():
 	about.mainloop()
 
 def loadSettings():
-	read_config = ConfigParser()
-	read_config.read("settings.ini")
-
-	# The options on the right.
-	if read_config.get("CheckBoxes", "snapshot") == "True":
-		snapshots.select()
-	else:
-		snapshots.deselect()
-
-	if read_config.get("CheckBoxes", "png") == "True":
-		packPNG.select()
-	else:
-		packPNG.deselect()
-
-	if read_config.get("CheckBoxes", "auto_pack") == "True":
-		autoPack.select()
-	else:
-		autoPack.deselect()
-
-	if read_config.get("CheckBoxes", "sounds") == "True":
-		sounds.select()
-	else:
-		sounds.deselect()
-
-	if read_config.get("CheckBoxes", "languages") == "True":
-		languages.select()
-	else:
-		languages.deselect()
-
-	if read_config.get("CheckBoxes", "compatibility") == "True":
-		compatibilityFixes.select()
-	else:
-		compatibilityFixes.deselect()
-
-	if read_config.get("CheckBoxes", "clear") == "True":
-		clear.select()
-	else:
-		delete.deselect()
-
-	if read_config.get("CheckBoxes", "zip") == "True":
-		zip.select()
-	else:
-		zip.deselect()
-
-	if read_config.get("CheckBoxes", "delete") == "True":
-		delete.select()
-	else:
-		delete.deselect()
-	zipButton()
-
-	# The fields on the left.
-	outputLocation.delete(0, END)
-	if read_config.get("Fields", "output_location").replace(" ", "") == "":
-		outputLocation.insert(0, desktopDir)
-	else:
-		outputLocation.insert(0, read_config.get("Fields", "output_location"))
-	packName.delete(0, END)
-	packName.insert(0, read_config.get("Fields", "name"))
-	minecraftVersion.delete(0, END)
-	minecraftVersion.insert(0, read_config.get("Fields", "version"))
-	snapshotButton()
-	packPNGSelect.delete(0, END)
-	packPNGSelect.insert(0, read_config.get("Fields", "png"))
-	packPNGButton()
-	description.delete(0, END)
-	description.insert(0, read_config.get("Fields", "description"))
-	formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
-	packFormatButton()
-
-	# Settings
 	global settingsDefaultOutputLocation
-	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
-		settingsDefaultOutputLocation = desktopDir
-	else:
-		settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
-		outputLocation.delete(0, END)
-		outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
+	try:
+		read_config = ConfigParser()
+		read_config.read("settings.ini")
 
-	if read_config.get("Settings", "intro_screen") == "True":
-		introUI()
+		# The options on the right.
+		if read_config.get("CheckBoxes", "snapshot") == "True":
+			snapshots.select()
+		else:
+			snapshots.deselect()
+
+		if read_config.get("CheckBoxes", "png") == "True":
+			packPNG.select()
+		else:
+			packPNG.deselect()
+
+		if read_config.get("CheckBoxes", "auto_pack") == "True":
+			autoPack.select()
+		else:
+			autoPack.deselect()
+
+		if read_config.get("CheckBoxes", "sounds") == "True":
+			sounds.select()
+		else:
+			sounds.deselect()
+
+		if read_config.get("CheckBoxes", "languages") == "True":
+			languages.select()
+		else:
+			languages.deselect()
+
+		if read_config.get("CheckBoxes", "compatibility") == "True":
+			compatibilityFixes.select()
+		else:
+			compatibilityFixes.deselect()
+
+		if read_config.get("CheckBoxes", "clear") == "True":
+			clear.select()
+		else:
+			delete.deselect()
+
+		if read_config.get("CheckBoxes", "zip") == "True":
+			zip.select()
+		else:
+			zip.deselect()
+
+		if read_config.get("CheckBoxes", "delete") == "True":
+			delete.select()
+		else:
+			delete.deselect()
+		zipButton()
+
+		# The fields on the left.
+		outputLocation.delete(0, END)
+		if read_config.get("Fields", "output_location").replace(" ", "") == "":
+			outputLocation.insert(0, desktopDir)
+		else:
+			outputLocation.insert(0, read_config.get("Fields", "output_location"))
+		packName.delete(0, END)
+		packName.insert(0, read_config.get("Fields", "name"))
+		minecraftVersion.delete(0, END)
+		minecraftVersion.insert(0, read_config.get("Fields", "version"))
+		snapshotButton()
+		packPNGSelect.delete(0, END)
+		packPNGSelect.insert(0, read_config.get("Fields", "png"))
+		packPNGButton()
+		description.delete(0, END)
+		description.insert(0, read_config.get("Fields", "description"))
+		formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
+		packFormatButton()
+
+		# Settings
+		if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
+			settingsDefaultOutputLocation = desktopDir
+		else:
+			settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
+			outputLocation.delete(0, END)
+			outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
+
+		if read_config.get("Settings", "intro_screen") == "True":
+			introUI()
+	except: # Default settings
+		read_config = ConfigParser()
+		read_config.read("default_settings.ini")
+
+		# The options on the right.
+		if read_config.get("CheckBoxes", "snapshot") == "True":
+			snapshots.select()
+		else:
+			snapshots.deselect()
+
+		if read_config.get("CheckBoxes", "png") == "True":
+			packPNG.select()
+		else:
+			packPNG.deselect()
+
+		if read_config.get("CheckBoxes", "auto_pack") == "True":
+			autoPack.select()
+		else:
+			autoPack.deselect()
+
+		if read_config.get("CheckBoxes", "sounds") == "True":
+			sounds.select()
+		else:
+			sounds.deselect()
+
+		if read_config.get("CheckBoxes", "languages") == "True":
+			languages.select()
+		else:
+			languages.deselect()
+
+		if read_config.get("CheckBoxes", "compatibility") == "True":
+			compatibilityFixes.select()
+		else:
+			compatibilityFixes.deselect()
+
+		if read_config.get("CheckBoxes", "clear") == "True":
+			clear.select()
+		else:
+			delete.deselect()
+
+		if read_config.get("CheckBoxes", "zip") == "True":
+			zip.select()
+		else:
+			zip.deselect()
+
+		if read_config.get("CheckBoxes", "delete") == "True":
+			delete.select()
+		else:
+			delete.deselect()
+		zipButton()
+
+		# The fields on the left.
+		outputLocation.delete(0, END)
+		if read_config.get("Fields", "output_location").replace(" ", "") == "":
+			outputLocation.insert(0, desktopDir)
+		else:
+			outputLocation.insert(0, read_config.get("Fields", "output_location"))
+		packName.delete(0, END)
+		packName.insert(0, read_config.get("Fields", "name"))
+		minecraftVersion.delete(0, END)
+		minecraftVersion.insert(0, read_config.get("Fields", "version"))
+		snapshotButton()
+		packPNGSelect.delete(0, END)
+		packPNGSelect.insert(0, read_config.get("Fields", "png"))
+		packPNGButton()
+		description.delete(0, END)
+		description.insert(0, read_config.get("Fields", "description"))
+		formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
+		packFormatButton()
+
+		# Settings
+		if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
+			settingsDefaultOutputLocation = desktopDir
+		else:
+			settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
+			outputLocation.delete(0, END)
+			outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
+
+		if read_config.get("Settings", "intro_screen") == "True":
+			introUI()
 
 def on_closing():
 	saveSettings()
