@@ -9,9 +9,9 @@ Unzip the file. (Right click the file -> Extract )
 ## Step 2
 Open Minecraft_Asset_Extractor.exe
 ## Step 3
-Select what type of version in the text box. (ex. 1.8.9)
+Select what version in the text box and change any other settings. (ex. 1.8.9)
 ## Step 4
-Click Extract and wait! It may say that it will not respond because the command prompt is currently extracting the files.
+Click Extract and wait!
 ## Step 5
 Close the window, and enjoy your fully extracted resource pack!
   
