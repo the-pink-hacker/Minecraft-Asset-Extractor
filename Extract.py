@@ -81,7 +81,7 @@ def getListOfFiles(dirName):
 				
 	return allFiles
 
-def ProgressBar(message, current, total, barLength = 20):
+def ProgressBar(message, current, total, barLength = 40):
 	percent = float(current) * 100 / total
 	arrow   = "\u25A0" * int(percent/100 * barLength - 1)
 	spaces  = " " * (barLength - len(arrow))
@@ -106,7 +106,7 @@ def Extract(args):
 	if MC_VERSION.replace(" ", "") == "":
 		print("No version provided.")
 		return
-	if PACK_PNG.replace(" ", "") == "" and CUSTOM_PACK_PNG == False:
+	if PACK_PNG.replace(" ", "") == "" and CUSTOM_PACK_PNG == True:
 		print("Warning, no image provided.")
 	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
 		PACK_PNG = "icon.png"
