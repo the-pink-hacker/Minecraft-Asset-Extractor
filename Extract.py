@@ -296,15 +296,17 @@ def Extract(args):
 		length = len(files)
 
 		try:
-			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}.zip"))
+			shutil.rmtree(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"))
 		except:
 			None
 
-		zip = ZipFile(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}.zip"),"a")
+		zip = ZipFile(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"),"a")
 
 		for file in files:
 			current += 1
 			print(str(format(round(100 * (current / length), 2), '.2f')) + "%")
+
+			print(f"{file.replace(os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}'), '')}")
 
 			zip.write(file, arcname=f"{file.replace(os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}'), '')}")
 		
