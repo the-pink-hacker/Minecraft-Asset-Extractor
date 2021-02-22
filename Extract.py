@@ -82,8 +82,8 @@ def getListOfFiles(dirName):
 
 def ProgressBar(message, current, total, barLength = 20):
 	percent = float(current) * 100 / total
-	arrow   = '-' * int(percent/100 * barLength - 1) + '>'
-	spaces  = ' ' * (barLength - len(arrow))
+	arrow   = "\u25A0" * int(percent/100 * barLength - 1)
+	spaces  = " " * (barLength - len(arrow))
 
 	if current >= total:
 		print(f"[%s%s] %d %% {message}" % (arrow, spaces, percent))
