@@ -3,6 +3,7 @@ from zipfile import ZipFile
 from pathlib import Path
 from threading import Thread
 import array as arr
+from PIL import Image
 
 OUTPUT_PATH = ""
 PACK_NAME = ""
@@ -107,6 +108,15 @@ def Extract(args):
 		return
 	if PACK_PNG.replace(" ", "") == "" and CUSTOM_PACK_PNG == False:
 		print("Warning, no image provided.")
+	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
+		PACK_PNG = "icon.png"
+	else:
+		image = Image.open(PACK_PNG)
+		width, height = image.size
+		image.close()
+		if image.size[0] != image.size[1]:
+			print("Image needs to be 1/1 aspect ratio.")
+			return
 
 	MC_VERSION_SNAPSHOT = MC_VERSION
 
@@ -268,9 +278,6 @@ def Extract(args):
 				# Copy the file
 				threadOBJ = Thread(target = ExtractOBJ, args = (currentThread, src_fpath, dest_fpath))
 				threadOBJ.start()
-
-	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
-		PACK_PNG = os.path.abspath("pack.png")
 	
 	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}"), exist_ok=True)
 

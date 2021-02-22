@@ -453,7 +453,7 @@ formatChoices.set(packFormats[5])
 
 # Sets the info about the window.
 root.focus_force()
-windowIcon = PhotoImage(file = "pack.png")
+windowIcon = PhotoImage(file = "icon.png")
 root.title("Minecraft Asset Extractor")
 root.iconphoto(False, windowIcon)
 root.minsize(550, 375)
