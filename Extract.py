@@ -79,6 +79,16 @@ def getListOfFiles(dirName):
 			allFiles.append(fullPath)
 				
 	return allFiles
+
+def ProgressBar(message, current, total, barLength = 20):
+	percent = float(current) * 100 / total
+	arrow   = '-' * int(percent/100 * barLength - 1) + '>'
+	spaces  = ' ' * (barLength - len(arrow))
+
+	if current >= total:
+		print(f"[%s%s] %d %% {message}" % (arrow, spaces, percent))
+	else:
+		print(f"[%s%s] %d %% {message}" % (arrow, spaces, percent), end='\r')
 	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 def Extract(args):
@@ -184,20 +194,20 @@ def Extract(args):
 				if len(fileName.split("/")) >= 6:
 					if fileName.split("/")[5] != "background":
 						current += 1
-						print("Extracting .jar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
+						ProgressBar("Extracting .jar Progress", current, length)
 						
 						# finds out what thread to use.
-						currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+						currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
 						# Copy the file
 						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
 						threadJAR.start()
 				else:
 					current += 1
-					print("Extracting .jar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
+					ProgressBar("Extracting .jar Progress", current, length)
 						
 					# finds out what thread to use.
-					currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+					currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
 					# Copy the file
 					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
@@ -222,13 +232,6 @@ def Extract(args):
 		length = 0
 		current = 0
 
-		if SOUNDS and LANGBOOL:
-			print("Extracting Sounds And Languages.")
-		elif not SOUNDS and LANGBOOL:
-			print("Extracting Languages.")
-		elif SOUNDS and not LANGBOOL:
-			print("Extracting Sounds.")
-
 		for fpath, fhash in sounds.items():
 			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
 				length += 1
@@ -238,22 +241,20 @@ def Extract(args):
 				current += 1
 
 				if SOUNDS and LANGBOOL:
-					print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					ProgressBar("Extracting Sounds And Languages Progress", current, length)
 				elif not SOUNDS and LANGBOOL:
-					print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					ProgressBar("Extracting Languages Progress", current, length)
 				elif SOUNDS and not LANGBOOL:
-					print("Extracting Sounds Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					ProgressBar("Extracting Sounds Progress", current, length)
 
 				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
 				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
 
 				# finds out what thread to use.
-				if current < os.cpu_count():
-					current += 1
+				if currentThread < os.cpu_count():
+					currentThread += 1
 				else:
-					current = 1
-			
-				currentThread = current
+					currentThread = 1
 
 				# Copy the file
 				threadOBJ = Thread(target = ExtractOBJ, args = (currentThread, src_fpath, dest_fpath))
@@ -281,38 +282,32 @@ def Extract(args):
 
 	shutil.copyfile(PACK_PNG, os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/pack.png"))
 
-	print(f"Extracted All Assets To {OUTPUT_PATH}{PACK_NAME} ")
+	print(f"\nExtracted All Assets To {os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}')}\ \n")
 
 	if ZIP_FILES == False:
 		print("Finished.")
 	else:
 		Clear(CLEAR)
 
-		print(f"Ziping {OUTPUT_PATH}{PACK_NAME}...")
-
 		files = getListOfFiles(os.path.normpath(f"{OUTPUT_PATH}\{PACK_NAME}"))
 
 		current = 0
 		length = len(files)
 
-		try:
-			shutil.rmtree(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"))
-		except:
-			None
+		if os.path.exists(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")):
+			os.remove(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"))
 
 		zip = ZipFile(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"),"a")
 
 		for file in files:
 			current += 1
-			print(str(format(round(100 * (current / length), 2), '.2f')) + "%")
-
-			print(f"{file.replace(os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}'), '')}")
+			ProgressBar("Zipping files", current, length)
 
 			zip.write(file, arcname=f"{file.replace(os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}'), '')}")
 		
 		zip.close()
 
-		print(f"Zipped {REAL_OUTPUT_PATH}{PACK_NAME}.zip")
+		print(f"\nZipped {os.path.normpath(f'{REAL_OUTPUT_PATH}//{PACK_NAME}')}.zip")
 
 		Clear(CLEAR)
 

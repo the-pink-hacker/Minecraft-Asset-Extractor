@@ -4,7 +4,6 @@ from threading import Thread
 from configparser import *
 from Extract import *
 from tkinter import *
-from tkinter import filedialog
 from datetime import datetime
 
 programVersion = "V0.5.0 - Beta"
