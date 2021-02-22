@@ -62,10 +62,26 @@ def ExtractJAR(args, zip, file):
 	except:
 		None
 	completed += 1
+
+def getListOfFiles(dirName):
+	# create a list of file and sub directories 
+	# names in the given directory 
+	listOfFile = os.listdir(dirName)
+	allFiles = list()
+	# Iterate over all the entries
+	for entry in listOfFile:
+		# Create full path
+		fullPath = os.path.join(dirName, entry)
+		# If entry is a directory then get the list of files in this directory 
+		if os.path.isdir(fullPath):
+			allFiles = allFiles + getListOfFiles(fullPath)
+		else:
+			allFiles.append(fullPath)
+				
+	return allFiles
 	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 def Extract(args):
-
 	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	Clear(CLEAR)
@@ -75,6 +91,8 @@ def Extract(args):
 	if SNAPSHOT_BOOL:
 		MC_VERSION_SNAPSHOT = SNAPSHOT
 
+	if PACK_NAME.replace(" ", "") == "":
+		PACK_NAME = "Minecraft Resources"
 
 	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
@@ -166,7 +184,7 @@ def Extract(args):
 				if len(fileName.split("/")) >= 6:
 					if fileName.split("/")[5] != "background":
 						current += 1
-						print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
+						print("Extracting .jar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
 						
 						# finds out what thread to use.
 						currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
@@ -176,7 +194,7 @@ def Extract(args):
 						threadJAR.start()
 				else:
 					current += 1
-					print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
+					print("Extracting .jar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
 						
 					# finds out what thread to use.
 					currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
@@ -226,13 +244,16 @@ def Extract(args):
 				elif SOUNDS and not LANGBOOL:
 					print("Extracting Sounds Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
 
-				# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
 				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
 				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
-				#print(fpath)
 
 				# finds out what thread to use.
-				currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+				if current < os.cpu_count():
+					current += 1
+				else:
+					current = 1
+			
+				currentThread = current
 
 				# Copy the file
 				threadOBJ = Thread(target = ExtractOBJ, args = (currentThread, src_fpath, dest_fpath))
@@ -260,23 +281,41 @@ def Extract(args):
 
 	shutil.copyfile(PACK_PNG, os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/pack.png"))
 
-	print(f"Extracted All Assets To {OUTPUT_PATH}\\{PACK_NAME} ")
+	print(f"Extracted All Assets To {OUTPUT_PATH}{PACK_NAME} ")
 
 	if ZIP_FILES == False:
 		print("Finished.")
 	else:
 		Clear(CLEAR)
 
-		print(f"Ziping {OUTPUT_PATH}\\{PACK_NAME}...")
+		print(f"Ziping {OUTPUT_PATH}{PACK_NAME}...")
 
-		shutil.make_archive(os.path.normpath(f"{REAL_OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+		files = getListOfFiles(os.path.normpath(f"{OUTPUT_PATH}\{PACK_NAME}"))
 
-		print(f"Zipped {REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")
+		current = 0
+		length = len(files)
+
+		try:
+			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}.zip"))
+		except:
+			None
+
+		zip = ZipFile(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}.zip"),"a")
+
+		for file in files:
+			current += 1
+			print(str(format(round(100 * (current / length), 2), '.2f')) + "%")
+
+			zip.write(file, arcname=f"{file.replace(os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}'), '')}")
+		
+		zip.close()
+
+		print(f"Zipped {REAL_OUTPUT_PATH}{PACK_NAME}.zip")
 
 		Clear(CLEAR)
 
 		if DELETE:
-
+			print("Cleaning Temp Files...")
 			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
 
 		print("Finished.")
