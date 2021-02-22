@@ -96,13 +96,22 @@ def Extract(args):
 
 	Clear(CLEAR)
 
+	if OUTPUT_PATH.replace(" ", "") == "":
+		print("No output path provided.")
+		return
+	if PACK_NAME.replace(" ", "") == "":
+		print("Warning, no name provided.")
+		PACK_NAME = "Minecraft Resources"
+	if MC_VERSION.replace(" ", "") == "":
+		print("No version provided.")
+		return
+	if PACK_PNG.replace(" ", "") == "" and CUSTOM_PACK_PNG == False:
+		print("Warning, no image provided.")
+
 	MC_VERSION_SNAPSHOT = MC_VERSION
 
 	if SNAPSHOT_BOOL:
 		MC_VERSION_SNAPSHOT = SNAPSHOT
-
-	if PACK_NAME.replace(" ", "") == "":
-		PACK_NAME = "Minecraft Resources"
 
 	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
@@ -261,7 +270,7 @@ def Extract(args):
 				threadOBJ.start()
 
 	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
-		PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
+		PACK_PNG = os.path.abspath("pack.png")
 	
 	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}"), exist_ok=True)
 
