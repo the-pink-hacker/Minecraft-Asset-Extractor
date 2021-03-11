@@ -17,6 +17,7 @@ MC_PACK = ""
 AUTO_PACK = False
 SOUNDS = False
 LANGBOOL = False
+REALMBOOL = False
 ZIP_FILES = False
 COMPATIBILITY = False
 CLEAR = False
@@ -28,8 +29,8 @@ def Clear(clear):
 	if clear == True:
 		os.system("cls")
 
-def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, zipFiles, compatibility, clear, delete):
-	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, realmBool, zipFiles, compatibility, clear, delete):
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	OUTPUT_PATH = outPath
 	PACK_NAME = packName
@@ -43,6 +44,7 @@ def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, cu
 	AUTO_PACK = autoPack
 	SOUNDS = sounds
 	LANGBOOL = langBool
+	REALMBOOL = realmBool
 	ZIP_FILES = zipFiles
 	COMPATIBILITY = compatibility
 	CLEAR = clear
@@ -93,7 +95,7 @@ def ProgressBar(message, current, total, barLength = 40):
 	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 def Extract(args):
-	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	Clear(CLEAR)
 
@@ -156,6 +158,11 @@ def Extract(args):
 	else:
 		LANG = "null"
 
+	if REALMBOOL == False:
+		REALM = "r";
+	else:
+		REALM = "null"
+
 	REAL_OUTPUT_PATH = OUTPUT_PATH
 
 	if ZIP_FILES == True and DELETE == True:
@@ -199,38 +206,40 @@ def Extract(args):
 
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if len(fileName.split("/")) >= 6:
-					if fileName.split("/")[5] != "background":
+				if fileName.split("/")[1][0] != REALM:
+					if len(fileName.split("/")) >= 6:
+						if fileName.split("/")[5] != "background":
+							length += 1
+					else:
 						length += 1
-				else:
-					length += 1
 
 		global completed
 
 		# Iterate over the file names
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if len(fileName.split("/")) >= 6:
-					if fileName.split("/")[5] != "background":
+				if fileName.split("/")[1][0] != REALM:
+					if len(fileName.split("/")) >= 6:
+						if fileName.split("/")[5] != "background":
+							current += 1
+							ProgressBar("Extracting .jar Progress", current, length)
+							
+							# finds out what thread to use.
+							currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
+
+							# Copy the file
+							threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
+							threadJAR.start()
+					else:
 						current += 1
 						ProgressBar("Extracting .jar Progress", current, length)
-						
+							
 						# finds out what thread to use.
 						currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
 						# Copy the file
 						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
 						threadJAR.start()
-				else:
-					current += 1
-					ProgressBar("Extracting .jar Progress", current, length)
-						
-					# finds out what thread to use.
-					currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
-
-					# Copy the file
-					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
-					threadJAR.start()
 
 		while completed != current:
 			time.sleep(0.1)

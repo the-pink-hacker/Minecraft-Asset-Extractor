@@ -39,6 +39,7 @@ def extract():
 	bool(autoPackBool.get()), # Auto Pack Format
 	bool(soundsBool.get()), # Sounds
 	bool(languagesBool.get()), # LANG
+	bool(realmBool.get()), # Realm Files
 	bool(zipBool.get()), # Zip
 	bool(compatibilityBool.get()), # Compatibility
 	bool(clearBool.get()), # Clear command line
@@ -207,166 +208,95 @@ def aboutUI():
 
 def loadSettings():
 	global settingsDefaultOutputLocation
-	try:
-		read_config = ConfigParser()
+
+	read_config = ConfigParser()
+
+	if os.path.exists("settings.ini"):
 		read_config.read("settings.ini")
-
-		# The options on the right.
-		if read_config.get("CheckBoxes", "snapshot") == "True":
-			snapshots.select()
-		else:
-			snapshots.deselect()
-
-		if read_config.get("CheckBoxes", "png") == "True":
-			packPNG.select()
-		else:
-			packPNG.deselect()
-
-		if read_config.get("CheckBoxes", "auto_pack") == "True":
-			autoPack.select()
-		else:
-			autoPack.deselect()
-
-		if read_config.get("CheckBoxes", "sounds") == "True":
-			sounds.select()
-		else:
-			sounds.deselect()
-
-		if read_config.get("CheckBoxes", "languages") == "True":
-			languages.select()
-		else:
-			languages.deselect()
-
-		if read_config.get("CheckBoxes", "compatibility") == "True":
-			compatibilityFixes.select()
-		else:
-			compatibilityFixes.deselect()
-
-		if read_config.get("CheckBoxes", "clear") == "True":
-			clear.select()
-		else:
-			delete.deselect()
-
-		if read_config.get("CheckBoxes", "zip") == "True":
-			zip.select()
-		else:
-			zip.deselect()
-
-		if read_config.get("CheckBoxes", "delete") == "True":
-			delete.select()
-		else:
-			delete.deselect()
-		zipButton()
-
-		# The fields on the left.
-		outputLocation.delete(0, END)
-		if read_config.get("Fields", "output_location").replace(" ", "") == "":
-			outputLocation.insert(0, desktopDir)
-		else:
-			outputLocation.insert(0, read_config.get("Fields", "output_location"))
-		packName.delete(0, END)
-		packName.insert(0, read_config.get("Fields", "name"))
-		minecraftVersion.delete(0, END)
-		minecraftVersion.insert(0, read_config.get("Fields", "version"))
-		snapshotButton()
-		packPNGSelect.delete(0, END)
-		packPNGSelect.insert(0, read_config.get("Fields", "png"))
-		packPNGButton()
-		description.delete(0, END)
-		description.insert(0, read_config.get("Fields", "description"))
-		formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
-		packFormatButton()
-
-		# Settings
-		if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
-			settingsDefaultOutputLocation = desktopDir
-		else:
-			settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
-			outputLocation.delete(0, END)
-			outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
-
-		if read_config.get("Settings", "intro_screen") == "True":
-			introUI()
-	except: # Default settings
-		read_config = ConfigParser()
+	else:
 		read_config.read("default_settings.ini")
 
-		# The options on the right.
-		if read_config.get("CheckBoxes", "snapshot") == "True":
-			snapshots.select()
-		else:
-			snapshots.deselect()
+	# The options on the right.
+	if read_config.get("CheckBoxes", "snapshot") == "True":
+		snapshots.select()
+	else:
+		snapshots.deselect()
 
-		if read_config.get("CheckBoxes", "png") == "True":
-			packPNG.select()
-		else:
-			packPNG.deselect()
+	if read_config.get("CheckBoxes", "png") == "True":
+		packPNG.select()
+	else:
+		packPNG.deselect()
 
-		if read_config.get("CheckBoxes", "auto_pack") == "True":
-			autoPack.select()
-		else:
-			autoPack.deselect()
+	if read_config.get("CheckBoxes", "auto_pack") == "True":
+		autoPack.select()
+	else:
+		autoPack.deselect()
 
-		if read_config.get("CheckBoxes", "sounds") == "True":
-			sounds.select()
-		else:
-			sounds.deselect()
+	if read_config.get("CheckBoxes", "sounds") == "True":
+		sounds.select()
+	else:
+		sounds.deselect()
 
-		if read_config.get("CheckBoxes", "languages") == "True":
-			languages.select()
-		else:
-			languages.deselect()
+	if read_config.get("CheckBoxes", "languages") == "True":
+		languages.select()
+	else:
+		languages.deselect()
 
-		if read_config.get("CheckBoxes", "compatibility") == "True":
-			compatibilityFixes.select()
-		else:
-			compatibilityFixes.deselect()
+	if read_config.get("CheckBoxes", "realm") == "True":
+		realm.select()
+	else:
+		realm.deselect()
 
-		if read_config.get("CheckBoxes", "clear") == "True":
-			clear.select()
-		else:
-			delete.deselect()
+	if read_config.get("CheckBoxes", "compatibility") == "True":
+		compatibilityFixes.select()
+	else:
+		compatibilityFixes.deselect()
 
-		if read_config.get("CheckBoxes", "zip") == "True":
-			zip.select()
-		else:
-			zip.deselect()
+	if read_config.get("CheckBoxes", "clear") == "True":
+		clear.select()
+	else:
+		delete.deselect()
 
-		if read_config.get("CheckBoxes", "delete") == "True":
-			delete.select()
-		else:
-			delete.deselect()
-		zipButton()
+	if read_config.get("CheckBoxes", "zip") == "True":
+		zip.select()
+	else:
+		zip.deselect()
 
-		# The fields on the left.
-		outputLocation.delete(0, END)
-		if read_config.get("Fields", "output_location").replace(" ", "") == "":
-			outputLocation.insert(0, desktopDir)
-		else:
-			outputLocation.insert(0, read_config.get("Fields", "output_location"))
-		packName.delete(0, END)
-		packName.insert(0, read_config.get("Fields", "name"))
-		minecraftVersion.delete(0, END)
-		minecraftVersion.insert(0, read_config.get("Fields", "version"))
-		snapshotButton()
-		packPNGSelect.delete(0, END)
-		packPNGSelect.insert(0, read_config.get("Fields", "png"))
-		packPNGButton()
-		description.delete(0, END)
-		description.insert(0, read_config.get("Fields", "description"))
-		formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
-		packFormatButton()
+	if read_config.get("CheckBoxes", "delete") == "True":
+		delete.select()
+	else:
+		delete.deselect()
+	zipButton()
+
+	# The fields on the left.
+	outputLocation.delete(0, END)
+	if read_config.get("Fields", "output_location").replace(" ", "") == "":
+		outputLocation.insert(0, desktopDir)
+	else:
+		outputLocation.insert(0, read_config.get("Fields", "output_location"))
+	packName.delete(0, END)
+	packName.insert(0, read_config.get("Fields", "name"))
+	minecraftVersion.delete(0, END)
+	minecraftVersion.insert(0, read_config.get("Fields", "version"))
+	snapshotButton()
+	packPNGSelect.delete(0, END)
+	packPNGSelect.insert(0, read_config.get("Fields", "png"))
+	packPNGButton()
+	description.delete(0, END)
+	description.insert(0, read_config.get("Fields", "description"))
+	formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
+	packFormatButton()
 
 		# Settings
-		if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
-			settingsDefaultOutputLocation = desktopDir
-		else:
-			settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
-			outputLocation.delete(0, END)
-			outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
+	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
+		settingsDefaultOutputLocation = desktopDir
+	else:
+		settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
+		outputLocation.delete(0, END)
+		outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
 
-		if read_config.get("Settings", "intro_screen") == "True":
-			introUI()
+	if read_config.get("Settings", "intro_screen") == "True":
+		introUI()
 
 def on_closing():
 	saveSettings()
@@ -395,6 +325,7 @@ def saveSettings():
 	write_config.set("CheckBoxes","auto_pack", str(bool(autoPackBool.get())))
 	write_config.set("CheckBoxes","sounds", str(bool(soundsBool.get())))
 	write_config.set("CheckBoxes","languages", str(bool(languagesBool.get())))
+	write_config.set("CheckBoxes","realm", str(bool(realmBool.get())))
 	write_config.set("CheckBoxes","zip", str(bool(zipBool.get())))
 	write_config.set("CheckBoxes","compatibility", str(bool(compatibilityBool.get())))
 	write_config.set("CheckBoxes","clear", str(bool(clearBool.get())))
@@ -437,6 +368,7 @@ autoPackBool = IntVar()
 packPNGBool = IntVar()
 soundsBool = IntVar()
 languagesBool = IntVar()
+realmBool = IntVar()
 snapshotsBool = IntVar()
 compatibilityBool = IntVar()
 zipBool = IntVar()
@@ -537,26 +469,29 @@ sounds.grid(row=2, column=2, sticky="W")
 languages = Checkbutton(root, variable=languagesBool, text="Lang Files")
 languages.grid(row=3, column=2, sticky="W")
 
+realm = Checkbutton(root, variable=realmBool, text="Realm Files")
+realm.grid(row=4, column=2, sticky="W")
+
 compatibilityFixes = Checkbutton(root, variable=compatibilityBool, text="Compatibility Fixes")
-compatibilityFixes.grid(row=4, column=2, sticky="W")
+compatibilityFixes.grid(row=5, column=2, sticky="W")
 
 snapshots = Checkbutton(root, command=snapshotButton, variable=snapshotsBool, text="Is a Snapshot")
-snapshots.grid(row=5, column=2, sticky="W")
+snapshots.grid(row=6, column=2, sticky="W")
 
 packPNG = Checkbutton(root, command=packPNGButton, variable=packPNGBool, text="Custom Pack Image")
-packPNG.grid(row=6, column=2, sticky="W")
+packPNG.grid(row=7, column=2, sticky="W")
 
 autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool, text="Auto Pack Format")
-autoPack.grid(row=7, column=2, sticky="W")
+autoPack.grid(row=8, column=2, sticky="W")
 
 zip = Checkbutton(root, command=zipButton, variable=zipBool, text="Zip Files")
-zip.grid(row=8, column=2, sticky="W")
+zip.grid(row=9, column=2, sticky="W")
 
 delete = Checkbutton(root, variable=deleteBool, text="Delete Folder After Zip")
-delete.grid(row=9, column=2, sticky="W")
+delete.grid(row=10, column=2, sticky="W")
 
 clear = Checkbutton(root, variable=clearBool, text="Clear Command Line")
-clear.grid(row=10, column=2, sticky="W")
+clear.grid(row=11, column=2, sticky="W")
 # endregion Options
 
 ### Bottom
