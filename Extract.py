@@ -89,9 +89,9 @@ def ProgressBar(message, current, total, barLength = 40):
 	spaces  = " " * (barLength - len(arrow))
 
 	if current >= total:
-		print(f"[%s%s] %d %% {message}" % (arrow, spaces, percent))
+		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent))
 	else:
-		print(f"[%s%s] %d %% {message}" % (arrow, spaces, percent), end='\r')
+		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent), end='\r')
 	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 def Extract(args):
