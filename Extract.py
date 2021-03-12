@@ -149,17 +149,17 @@ def Extract(args):
 				MC_PACK = 1
 
 	if SOUNDS == True:
-		SOUND = "s";
+		SOUND = "sounds";
 	else:
 		SOUND = "null"
 
 	if LANGBOOL == True:
-		LANG = "l";
+		LANG = "lang";
 	else:
 		LANG = "null"
 
 	if REALMBOOL == False:
-		REALM = "r";
+		REALM = "realm";
 	else:
 		REALM = "null"
 
@@ -206,7 +206,7 @@ def Extract(args):
 
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if fileName.split("/")[1][0] != REALM:
+				if fileName.split("/")[1] != REALM:
 					if len(fileName.split("/")) >= 6:
 						if fileName.split("/")[5] != "background":
 							length += 1
@@ -218,7 +218,7 @@ def Extract(args):
 		# Iterate over the file names
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if fileName.split("/")[1][0] != REALM:
+				if fileName.split("/")[1] != REALM:
 					if len(fileName.split("/")) >= 6:
 						if fileName.split("/")[5] != "background":
 							current += 1
@@ -261,11 +261,11 @@ def Extract(args):
 		current = 0
 
 		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+			if fpath == SOUND or fpath[0] == "t" or fpath == LANG:
 				length += 1
 
 		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+			if fpath == SOUND or fpath[0] == "t" or fpath == LANG:
 				current += 1
 
 				if SOUNDS and LANGBOOL:
