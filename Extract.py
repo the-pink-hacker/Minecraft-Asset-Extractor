@@ -3,6 +3,7 @@ from zipfile import ZipFile
 from pathlib import Path
 from threading import Thread
 import array as arr
+from PIL import Image
 
 OUTPUT_PATH = ""
 PACK_NAME = ""
@@ -16,6 +17,7 @@ MC_PACK = ""
 AUTO_PACK = False
 SOUNDS = False
 LANGBOOL = False
+REALMBOOL = False
 ZIP_FILES = False
 COMPATIBILITY = False
 CLEAR = False
@@ -27,8 +29,8 @@ def Clear(clear):
 	if clear == True:
 		os.system("cls")
 
-def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, zipFiles, compatibility, clear, delete):
-	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, realmBool, zipFiles, compatibility, clear, delete):
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	OUTPUT_PATH = outPath
 	PACK_NAME = packName
@@ -42,6 +44,7 @@ def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, cu
 	AUTO_PACK = autoPack
 	SOUNDS = sounds
 	LANGBOOL = langBool
+	REALMBOOL = realmBool
 	ZIP_FILES = zipFiles
 	COMPATIBILITY = compatibility
 	CLEAR = clear
@@ -62,19 +65,65 @@ def ExtractJAR(args, zip, file):
 	except:
 		None
 	completed += 1
+
+def getListOfFiles(dirName):
+	# create a list of file and sub directories 
+	# names in the given directory 
+	listOfFile = os.listdir(dirName)
+	allFiles = list()
+	# Iterate over all the entries
+	for entry in listOfFile:
+		# Create full path
+		fullPath = os.path.join(dirName, entry)
+		# If entry is a directory then get the list of files in this directory 
+		if os.path.isdir(fullPath):
+			allFiles = allFiles + getListOfFiles(fullPath)
+		else:
+			allFiles.append(fullPath)
+				
+	return allFiles
+
+def ProgressBar(message, current, total, barLength = 40):
+	percent = float(current) * 100 / total
+	arrow   = "\u25A0" * int(percent/100 * barLength - 1)
+	spaces  = " " * (barLength - len(arrow))
+
+	if current >= total:
+		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent))
+	else:
+		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent), end='\r')
 	
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
 def Extract(args):
-
-	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	Clear(CLEAR)
+
+	if OUTPUT_PATH.replace(" ", "") == "":
+		print("No output path provided.")
+		return
+	if PACK_NAME.replace(" ", "") == "":
+		print("Warning, no name provided.")
+		PACK_NAME = "Minecraft Resources"
+	if MC_VERSION.replace(" ", "") == "":
+		print("No version provided.")
+		return
+	if PACK_PNG.replace(" ", "") == "" and CUSTOM_PACK_PNG == True:
+		print("Warning, no image provided.")
+	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
+		PACK_PNG = "icon.png"
+	else:
+		image = Image.open(PACK_PNG)
+		width, height = image.size
+		image.close()
+		if image.size[0] != image.size[1]:
+			print("Image needs to be 1/1 aspect ratio.")
+			return
 
 	MC_VERSION_SNAPSHOT = MC_VERSION
 
 	if SNAPSHOT_BOOL:
 		MC_VERSION_SNAPSHOT = SNAPSHOT
-
 
 	# Finds the pack format that matches with the selected version.
 	if AUTO_PACK == True:
@@ -100,14 +149,19 @@ def Extract(args):
 				MC_PACK = 1
 
 	if SOUNDS == True:
-		SOUND = "s";
+		SOUND = "sounds";
 	else:
 		SOUND = "null"
 
 	if LANGBOOL == True:
-		LANG = "l";
+		LANG = "lang";
 	else:
 		LANG = "null"
+
+	if REALMBOOL == False:
+		REALM = "realm";
+	else:
+		REALM = "null"
 
 	REAL_OUTPUT_PATH = OUTPUT_PATH
 
@@ -152,38 +206,40 @@ def Extract(args):
 
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if len(fileName.split("/")) >= 6:
-					if fileName.split("/")[5] != "background":
+				if fileName.split("/")[1] != REALM:
+					if len(fileName.split("/")) >= 6:
+						if fileName.split("/")[5] != "background":
+							length += 1
+					else:
 						length += 1
-				else:
-					length += 1
 
 		global completed
 
 		# Iterate over the file names
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if len(fileName.split("/")) >= 6:
-					if fileName.split("/")[5] != "background":
+				if fileName.split("/")[1] != REALM:
+					if len(fileName.split("/")) >= 6:
+						if fileName.split("/")[5] != "background":
+							current += 1
+							ProgressBar("Extracting .jar Progress", current, length)
+							
+							# finds out what thread to use.
+							currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
+
+							# Copy the file
+							threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
+							threadJAR.start()
+					else:
 						current += 1
-						print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
-						
+						ProgressBar("Extracting .jar Progress", current, length)
+							
 						# finds out what thread to use.
-						currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+						currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
 						# Copy the file
 						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
 						threadJAR.start()
-				else:
-					current += 1
-					print("Extracting .rar Progress: " + str(format(round(100 * (current / length), 2), '.2f')) + "%")
-						
-					# finds out what thread to use.
-					currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
-
-					# Copy the file
-					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
-					threadJAR.start()
 
 		while completed != current:
 			time.sleep(0.1)
@@ -204,42 +260,33 @@ def Extract(args):
 		length = 0
 		current = 0
 
-		if SOUNDS and LANGBOOL:
-			print("Extracting Sounds And Languages.")
-		elif not SOUNDS and LANGBOOL:
-			print("Extracting Languages.")
-		elif SOUNDS and not LANGBOOL:
-			print("Extracting Sounds.")
-
 		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+			if fpath == SOUND or fpath[0] == "t" or fpath == LANG:
 				length += 1
 
 		for fpath, fhash in sounds.items():
-			if fpath[0] == SOUND or fpath[0] == "t" or fpath[0] == LANG:
+			if fpath == SOUND or fpath[0] == "t" or fpath == LANG:
 				current += 1
 
 				if SOUNDS and LANGBOOL:
-					print("Extracting Sounds And Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					ProgressBar("Extracting Sounds And Languages Progress", current, length)
 				elif not SOUNDS and LANGBOOL:
-					print("Extracting Languages Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					ProgressBar("Extracting Languages Progress", current, length)
 				elif SOUNDS and not LANGBOOL:
-					print("Extracting Sounds Progress: " + str(format(round(100 * (current / length), 1), '.2f')) + "%")
+					ProgressBar("Extracting Sounds Progress", current, length)
 
-				# Ensure the paths are good to go for Windows with properly escaped backslashes in the string
 				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
 				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
-				#print(fpath)
 
 				# finds out what thread to use.
-				currentThread = round((os.cpu_count() - 2) * (current / length)) + 1
+				if currentThread < os.cpu_count():
+					currentThread += 1
+				else:
+					currentThread = 1
 
 				# Copy the file
 				threadOBJ = Thread(target = ExtractOBJ, args = (currentThread, src_fpath, dest_fpath))
 				threadOBJ.start()
-
-	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
-		PACK_PNG = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "pack.png")
 	
 	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}"), exist_ok=True)
 
@@ -260,23 +307,37 @@ def Extract(args):
 
 	shutil.copyfile(PACK_PNG, os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/pack.png"))
 
-	print(f"Extracted All Assets To {OUTPUT_PATH}\\{PACK_NAME} ")
+	print(f"\nExtracted All Assets To {os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}')}\ \n")
 
 	if ZIP_FILES == False:
 		print("Finished.")
 	else:
 		Clear(CLEAR)
 
-		print(f"Ziping {OUTPUT_PATH}\\{PACK_NAME}...")
+		files = getListOfFiles(os.path.normpath(f"{OUTPUT_PATH}\{PACK_NAME}"))
 
-		shutil.make_archive(os.path.normpath(f"{REAL_OUTPUT_PATH}/{PACK_NAME}"), 'zip', os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}"))
+		current = 0
+		length = len(files)
 
-		print(f"Zipped {REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")
+		if os.path.exists(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")):
+			os.remove(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"))
+
+		zip = ZipFile(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"),"a")
+
+		for file in files:
+			current += 1
+			ProgressBar("Zipping files", current, length)
+
+			zip.write(file, arcname=f"{file.replace(os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}'), '')}")
+		
+		zip.close()
+
+		print(f"\nZipped {os.path.normpath(f'{REAL_OUTPUT_PATH}//{PACK_NAME}')}.zip")
 
 		Clear(CLEAR)
 
 		if DELETE:
-
+			print("Cleaning Temp Files...")
 			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
 
 		print("Finished.")
