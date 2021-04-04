@@ -1,4 +1,4 @@
-import os, webbrowser
+import os, webbrowser, json
 from time import sleep
 from threading import Thread
 from configparser import *
@@ -345,24 +345,14 @@ def saveSettings():
 	write_config.write(cfgfile)
 	cfgfile.close()
 
-# Creates the available choices in the pack format drop down
-packFormats = [
-"1",
-"2",
-"3",
-"4",
-"5",
-"6",
-"7"
-]
+# Parses data from config.json
+configFile = open("config.json")
+configVaribles = json.load(configFile)
+configFile.close()
 
-# Creates the available choices in the snapshot letters drop down
-snapshotLetters = [
-"a",
-"b",
-"c",
-"d"
-]
+packFormats = configVaribles["pack_format"]
+
+snapshotLetters = configVaribles["snapshot_letters"]
 
 root = Tk()
 
