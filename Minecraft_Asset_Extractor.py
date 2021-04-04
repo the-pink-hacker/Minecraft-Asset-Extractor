@@ -1,4 +1,5 @@
 import os, webbrowser, json
+from Extract import AutoPack
 from time import sleep
 from threading import Thread
 from configparser import *
@@ -32,6 +33,15 @@ class RowHandeler:
 
 		return self.currentRow
 
+def versionCheck(var = None, indx = None, mode = None):
+	try:
+		if (AutoPack(minecraftVersion.get()) >= 5):
+			shaders.configure(state="normal")
+		else:
+			shaders.configure(state="disabled")
+	except:
+		None
+
 def convertToRGB(r, g, b):
 	"""translates rgb to a tkinter friendly color code
 	"""
@@ -59,6 +69,7 @@ def extract():
 	formatChoices.get(), # Pack Format
 	bool(autoPackBool.get()), # Auto Pack Format
 	bool(soundsBool.get()), # Sounds
+	bool(shadersBool.get()), # Shaders
 	bool(languagesBool.get()), # LANG
 	bool(realmBool.get()), # Realm Files
 	bool(zipBool.get()), # Zip
@@ -151,10 +162,6 @@ def introUI():
 	spacer = Label(intro, text="", pady=10).grid(row=GetRow(), column=0, sticky="NW")
 
 	generateLink(intro, configVaribles["links"][2], GetRow).place(relx=0.5, rely=0.5, anchor="center")
-
-	#introgithubProject = Label(intro, text="Minecraft Asset Extractor Github Page", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	#introgithubProject.place(relx=0.5, rely=0.5, anchor="center")
-	#introgithubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
 
 	introVersion = Label(intro, text=programVersion)
 	introVersion.place(relx=0.0, rely=1.0, anchor="sw")
@@ -397,6 +404,10 @@ compatibilityBool = IntVar()
 zipBool = IntVar()
 clearBool = IntVar()
 deleteBool = IntVar()
+shadersBool = IntVar()
+
+minecraftVersionVar = StringVar()
+minecraftVersionVar.trace_add("write", versionCheck)
 
 # Sets defualt value for the snapshot letter
 snapshotLetterSelection = StringVar(root)
@@ -449,8 +460,7 @@ packName = Entry(root, width=50)
 packName.grid(row=GetRow(), column=0, sticky="W")
 
 minecraftVersionText = Label(root, text="Minecraft Version (e.g. 1.16.4, 1.17):").grid(row=GetRow(), column=0, sticky="W")
-minecraftVersion = Entry(root, width=50)
-minecraftVersion.insert(0, "1.16.4")
+minecraftVersion = Entry(root, width=50, textvariable=minecraftVersionVar, validate="focusout", validatecommand=versionCheck)
 minecraftVersion.grid(row=GetRow(), column=0, sticky="W")
 
 snapshotText = Label(root, text="Snapshot Version:").grid(row=GetRow(), column=0, sticky="W")
@@ -494,6 +504,9 @@ GetRow = RowHandeler(2).GetRow
 
 sounds = Checkbutton(root, variable=soundsBool, text="Sound Files")
 sounds.grid(row=GetRow(), column=2, sticky="W")
+
+shaders = Checkbutton(root, variable=shadersBool, text="Shader Files")
+shaders.grid(row=GetRow(), column=2, sticky="W")
 
 languages = Checkbutton(root, variable=languagesBool, text="Lang Files")
 languages.grid(row=GetRow(), column=2, sticky="W")

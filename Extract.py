@@ -16,6 +16,7 @@ DESCRIPTION = ""
 MC_PACK = ""
 AUTO_PACK = False
 SOUNDS = False
+SHADERSBOOL = False
 LANGBOOL = False
 REALMBOOL = False
 ZIP_FILES = False
@@ -25,14 +26,39 @@ DELETE = False
 
 completed = 0
 
+# Finds the pack format that matches with the selected version
+def AutoPack(version):
+	version = str(version)
+	if int(version.split(".")[1]) >= 17:
+		return int(version.split(".")[1]) - 10
+	elif int(version.split(".")[1]) == 16:
+		if int(version.split(".")[2]) >= 2:
+			return 6
+		else:
+			return 5
+	elif int(version.split(".")[1]) >= 15:
+		return 5
+	elif int(version.split(".")[1]) >= 13:
+		return 4
+	elif int(version.split(".")[1]) >= 11:
+		return 3
+	elif int(version.split(".")[1]) >= 9:
+		return 2
+	elif int(version.split(".")[1]) >= 7:
+		return 1
+	elif int(version.split(".")[1]) >= 6:
+		if int(version.split(".")[2]) == 1:
+			return 1
+	return 5
+
 # Clears the console
 def Clear(clear):
 	if clear == True:
 		os.system("cls")
 
 # Starts the extracting process
-def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, realmBool, zipFiles, compatibility, clear, delete):
-	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, shaders, langBool, realmBool, zipFiles, compatibility, clear, delete):
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, SHADERSBOOL, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	OUTPUT_PATH = outPath
 	PACK_NAME = packName
@@ -45,6 +71,8 @@ def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, cu
 	MC_PACK = pack
 	AUTO_PACK = autoPack
 	SOUNDS = sounds
+	SHADERSBOOL = shaders
+	print(shaders)
 	LANGBOOL = langBool
 	REALMBOOL = realmBool
 	ZIP_FILES = zipFiles
@@ -98,9 +126,18 @@ def ProgressBar(message, current, total, barLength = 40):
 	else:
 		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent), end='\r')
 
+def Check(fileName, text, index):
+	if (len(fileName.split("/")) >= index + 1):
+		if (fileName.split("/")[index] == text):
+			return False
+		else:
+			return True
+	else:
+		return False
+
 # This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory
 def Extract(args):
-	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
+	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, SHADERSBOOL, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
 	Clear(CLEAR)
 
@@ -130,41 +167,25 @@ def Extract(args):
 	if SNAPSHOT_BOOL:
 		MC_VERSION_SNAPSHOT = SNAPSHOT
 
-	# Finds the pack format that matches with the selected version
-	if AUTO_PACK == True:
-		if int(MC_VERSION.split(".")[1]) >= 17:
-			MC_PACK = 7
-		elif int(MC_VERSION.split(".")[1]) == 16:
-			if int(MC_VERSION.split(".")[2]) >= 2:
-				MC_PACK = 6
-			else:
-				MC_PACK = 5
-		elif int(MC_VERSION.split(".")[1]) >= 15:
-			MC_PACK = 5
-		elif int(MC_VERSION.split(".")[1]) >= 13:
-			MC_PACK = 4
-		elif int(MC_VERSION.split(".")[1]) >= 11:
-			MC_PACK = 3
-		elif int(MC_VERSION.split(".")[1]) >= 9:
-			MC_PACK = 2
-		elif int(MC_VERSION.split(".")[1]) >= 7:
-			MC_PACK = 1
-		elif int(MC_VERSION.split(".")[1]) >= 6:
-			if int(MC_VERSION.split(".")[2]) == 1:
-				MC_PACK = 1
+	MC_PACK = AutoPack(MC_VERSION)
 
 	if SOUNDS == True:
-		SOUND = "sounds";
+		SOUND = "sounds"
 	else:
 		SOUND = "null"
 
+	if SHADERSBOOL == False:
+		SHADERS = "shaders"
+	else:
+		SHADERS = "null"
+
 	if LANGBOOL == True:
-		LANG = "lang";
+		LANG = "lang"
 	else:
 		LANG = "null"
 
 	if REALMBOOL == False:
-		REALM = "realm";
+		REALM = "realm"
 	else:
 		REALM = "null"
 
@@ -211,7 +232,7 @@ def Extract(args):
 
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if fileName.split("/")[1] != REALM:
+				if fileName.split("/")[1] != REALM and Check(fileName, SHADERS, 2):
 					if len(fileName.split("/")) >= 6:
 						if fileName.split("/")[5] != "background":
 							length += 1
@@ -223,7 +244,7 @@ def Extract(args):
 		# Iterate over the file names
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
-				if fileName.split("/")[1] != REALM:
+				if fileName.split("/")[1] != REALM and Check(fileName, SHADERS, 2):
 					if len(fileName.split("/")) >= 6:
 						if fileName.split("/")[5] != "background":
 							current += 1
