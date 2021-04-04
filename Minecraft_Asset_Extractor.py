@@ -1,4 +1,5 @@
-import os, webbrowser
+import os, webbrowser, json
+from Extract import AutoPack
 from time import sleep
 from threading import Thread
 from configparser import *
@@ -7,11 +8,39 @@ from tkinter import *
 from tkinter import filedialog
 from datetime import datetime
 
-programVersion = "V0.5.0 - Beta"
+# Parses data from config.json
+configFile = open("config.json")
+configVaribles = json.load(configFile)
+configFile.close()
+
+programVersion = configVaribles["program_version"]
+
+packFormats = configVaribles["pack_format"]
+snapshotLetters = configVaribles["snapshot_letters"]
 
 desktopDir = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
 settingsDefaultOutputLocation = desktopDir
+
+# Helps automate the placement of lables
+class RowHandeler:
+	def __init__(self, startingRow):
+		self.currentRow = startingRow - 1
+
+	def GetRow(self, keepRow = False):
+		if (keepRow == False):
+			self.currentRow += 1
+
+		return self.currentRow
+
+def versionCheck(var = None, indx = None, mode = None):
+	try:
+		if (AutoPack(minecraftVersion.get()) >= 5):
+			shaders.configure(state="normal")
+		else:
+			shaders.configure(state="disabled")
+	except:
+		None
 
 def convertToRGB(r, g, b):
 	"""translates rgb to a tkinter friendly color code
@@ -40,6 +69,7 @@ def extract():
 	formatChoices.get(), # Pack Format
 	bool(autoPackBool.get()), # Auto Pack Format
 	bool(soundsBool.get()), # Sounds
+	bool(shadersBool.get()), # Shaders
 	bool(languagesBool.get()), # LANG
 	bool(realmBool.get()), # Realm Files
 	bool(zipBool.get()), # Zip
@@ -98,6 +128,23 @@ def closeWindow(window):
 	window.destroy()
 	root.focus_force()
 
+def generateLink(window, link, GetRow):
+	# Parses names and urls
+	link = str(link)
+	link = link.replace("{", "")
+	link = link.replace("'", "")
+	link = link.replace("}", "")
+	link = link.split(": ")
+
+	name = link[0]
+	url = link[1]
+
+	# Creates lable
+	linkText = Label(window, text=name, fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	linkText.bind("<Button-1>", lambda e: callback(url))
+
+	return linkText
+
 def introUI():
 	intro = Toplevel(root)
 
@@ -110,11 +157,11 @@ def introUI():
 	settingsTitleText = Label(intro, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
-	spacer = Label(intro, text="", pady=10).grid(row=0, column=0, sticky="NW")
+	GetRow = RowHandeler(0).GetRow
 
-	introgithubProject = Label(intro, text="Minecraft Asset Extractor Github Page", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	introgithubProject.place(relx=0.5, rely=0.5, anchor="center")
-	introgithubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
+	spacer = Label(intro, text="", pady=10).grid(row=GetRow(), column=0, sticky="NW")
+
+	generateLink(intro, configVaribles["links"][2], GetRow).place(relx=0.5, rely=0.5, anchor="center")
 
 	introVersion = Label(intro, text=programVersion)
 	introVersion.place(relx=0.0, rely=1.0, anchor="sw")
@@ -136,16 +183,18 @@ def settingsUI():
 	settingsTitleText = Label(setting, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
-	spacer = Label(setting, text="", pady=10).grid(row=0, column=0, sticky="NW")
+	GetRow = RowHandeler(0).GetRow
+
+	spacer = Label(setting, text="", pady=10).grid(row=GetRow(), column=0, sticky="NW")
 
 	global defaultOutputLocation
 
-	outputLocationText = Label(setting, text="Default Output Location:").grid(row=1, column=0, sticky="W")
+	outputLocationText = Label(setting, text="Default Output Location:").grid(row=GetRow(), column=0, sticky="W")
 	defaultOutputLocation = Entry(setting, width=50)
 	defaultOutputLocation.insert(0, settingsDefaultOutputLocation)
-	defaultOutputLocation.grid(row=2, column=0, sticky="W")
+	defaultOutputLocation.grid(row=GetRow(), column=0, sticky="W")
 	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation), relief="flat")
-	outputLocationButton.grid(row=2, column=1)
+	outputLocationButton.grid(row=GetRow(True), column=1)
 	outputLocationButton.bind("<Enter>", onEnter)
 	outputLocationButton.bind("<Leave>", onLeave)
 
@@ -156,6 +205,24 @@ def settingsUI():
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
+
+# Takes an array of links and converts them into lables
+def generateLinks(window, links, GetRow):
+	for index in range(len(links)):
+		# Parses names and urls
+		link = str(links[index])
+		link = link.replace("{", "")
+		link = link.replace("'", "")
+		link = link.replace("}", "")
+		link = link.split(": ")
+
+		name = link[0]
+		url = link[1]
+
+		# Creates lable
+		linkText = Label(window, text=name, fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+		linkText.grid(row=GetRow(), column=0, sticky="W")
+		linkText.bind("<Button-1>", lambda e: callback(url))
 
 def aboutUI():
 	about = Toplevel(root)
@@ -169,34 +236,14 @@ def aboutUI():
 	aboutTitleText = Label(about, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 	aboutTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
-	spacer = Label(about, text="", pady=10).grid(row=0, column=0, sticky="N")
+	GetRow = RowHandeler(0).GetRow
+
+	spacer = Label(about, text="", pady=10).grid(row=GetRow(), column=0, sticky="N")
 
 	aboutText = Label(about, text="Ryan Garret (RyanGar46):")
-	aboutText.grid(row=1, column=0, sticky="W")
+	aboutText.grid(row=GetRow(), column=0, sticky="W")
 
-	github = Label(about, text="GitHub", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	github.grid(row=2, column=0, sticky="W")
-	github.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46"))
-
-	githubProject = Label(about, text="Minecraft Asset Extractor Github Page", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	githubProject.grid(row=3, column=0, sticky="W")
-	githubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
-
-	twitter = Label(about, text="Twitter", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	twitter.grid(row=4, column=0, sticky="W")
-	twitter.bind("<Button-1>", lambda e: callback("https://twitter.com/RyanGar46"))
-
-	youtube = Label(about, text="YouTube", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	youtube.grid(row=5, column=0, sticky="W")
-	youtube.bind("<Button-1>", lambda e: callback("https://www.youtube.com/channel/UCa5CoSRScfDUtoEAenjbnZg"))
-
-	curseforge = Label(about, text="CurseForge", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	curseforge.grid(row=6, column=0, sticky="W")
-	curseforge.bind("<Button-1>", lambda e: callback("https://www.curseforge.com/members/ryangar46/projects"))
-
-	planetMC = Label(about, text="Planet Minecraft", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	planetMC.grid(row=7, column=0, sticky="W")
-	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
+	generateLinks(about, configVaribles["links"], GetRow)
 
 	version = Label(about, text=programVersion)
 	version.place(relx=0.0, rely=1.0, anchor="sw")
@@ -345,25 +392,6 @@ def saveSettings():
 	write_config.write(cfgfile)
 	cfgfile.close()
 
-# Creates the available choices in the pack format drop down
-packFormats = [
-"1",
-"2",
-"3",
-"4",
-"5",
-"6",
-"7"
-]
-
-# Creates the available choices in the snapshot letters drop down
-snapshotLetters = [
-"a",
-"b",
-"c",
-"d"
-]
-
 root = Tk()
 
 autoPackBool = IntVar()
@@ -376,6 +404,10 @@ compatibilityBool = IntVar()
 zipBool = IntVar()
 clearBool = IntVar()
 deleteBool = IntVar()
+shadersBool = IntVar()
+
+minecraftVersionVar = StringVar()
+minecraftVersionVar.trace_add("write", versionCheck)
 
 # Sets defualt value for the snapshot letter
 snapshotLetterSelection = StringVar(root)
@@ -394,11 +426,13 @@ root.minsize(550, 375)
 
 ### Feilds
 # region
+GetRow = RowHandeler(0).GetRow
+
 titleText = Label(root, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
 titleText.place(relx=0.5, rely=0.0, anchor="n")
 
 settings = Button(root, text="Settings", command=settingsUI, relief="flat")
-settings.grid(row=0, column=0, sticky=NW)
+settings.grid(row=GetRow(), column=0, sticky=NW)
 settings.bind("<Enter>", onEnter)
 settings.bind("<Leave>", onLeave)
 
@@ -412,25 +446,24 @@ introButton.place(x=91, y=0, anchor=NW)
 introButton.bind("<Enter>", onEnter)
 introButton.bind("<Leave>", onLeave)
 
-outputLocationText = Label(root, text="Output Location:").grid(row=1, column=0, sticky="W")
+outputLocationText = Label(root, text="Output Location:").grid(row=GetRow(), column=0, sticky="W")
 outputLocation = Entry(root, width=50)
 outputLocation.insert(0, desktopDir)
-outputLocation.grid(row=2, column=0, sticky="W")
+outputLocation.grid(row=GetRow(), column=0, sticky="W")
 outputLocationButton = Button(root, text="Select Folder", command=lambda:openFolder(root, outputLocation), relief="flat")
-outputLocationButton.grid(row=2, column=1)
+outputLocationButton.grid(row=GetRow(True), column=1)
 outputLocationButton.bind("<Enter>", onEnter)
 outputLocationButton.bind("<Leave>", onLeave)
 
-packNameText = Label(root, text="Resource Pack Name:").grid(row=3, column=0, sticky="W")
+packNameText = Label(root, text="Resource Pack Name:").grid(row=GetRow(), column=0, sticky="W")
 packName = Entry(root, width=50)
-packName.grid(row=4, column=0, sticky="W")
+packName.grid(row=GetRow(), column=0, sticky="W")
 
-minecraftVersionText = Label(root, text="Minecraft Version (e.g. 1.16.4, 1.17):").grid(row=5, column=0, sticky="W")
-minecraftVersion = Entry(root, width=50)
-minecraftVersion.insert(0, "1.16.4")
-minecraftVersion.grid(row=6, column=0, sticky="W")
+minecraftVersionText = Label(root, text="Minecraft Version (e.g. 1.16.4, 1.17):").grid(row=GetRow(), column=0, sticky="W")
+minecraftVersion = Entry(root, width=50, textvariable=minecraftVersionVar, validate="focusout", validatecommand=versionCheck)
+minecraftVersion.grid(row=GetRow(), column=0, sticky="W")
 
-snapshotText = Label(root, text="Snapshot Version:").grid(row=7, column=0, sticky="W")
+snapshotText = Label(root, text="Snapshot Version:").grid(row=GetRow(), column=0, sticky="W")
 
 snapshotYearText = Label(root, text="Year:").place(x=0, y=205, anchor=W)
 snapshotYear = Entry(root, width=2)
@@ -446,54 +479,61 @@ snapshotLetterText = Label(root, text="Letter:").place(x=125, y=205, anchor=W)
 snapshotLetter = OptionMenu(root, snapshotLetterSelection, *snapshotLetters)
 snapshotLetter.place(x=165, y=205, anchor=W)
 
-packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=9, column=0, sticky="W")
+GetRow()
+
+packPNGSelectText = Label(root, text="Custom Pack Icon:").grid(row=GetRow(), column=0, sticky="W")
 packPNGSelect = Entry(root, width=50)
-packPNGSelect.grid(row=10, column=0, sticky="W")
+packPNGSelect.grid(row=GetRow(), column=0, sticky="W")
 packPNGSelectButton = Button(root, text="Select File", command=openFile, state="disabled", relief="flat")
-packPNGSelectButton.grid(row=10, column=1)
+packPNGSelectButton.grid(row=GetRow(True), column=1)
 packPNGSelectButton.bind("<Enter>", onEnter)
 packPNGSelectButton.bind("<Leave>", onLeave)
 
-descriptionText = Label(root, text="Description:").grid(row=11, column=0, sticky="W")
+descriptionText = Label(root, text="Description:").grid(row=GetRow(), column=0, sticky="W")
 description = Entry(root, width=50)
-description.grid(row=12, column=0, sticky="W")
+description.grid(row=GetRow(), column=0, sticky="W")
 
-packFormatText = Label(root, text="Pack Format:").grid(row=13, column=0, sticky="W")
+packFormatText = Label(root, text="Pack Format:").grid(row=GetRow(), column=0, sticky="W")
 packFormat = OptionMenu(root, formatChoices, *packFormats)
-packFormat.grid(row=14, column=0, sticky="W")
+packFormat.grid(row=GetRow(), column=0, sticky="W")
 # endregion
 
 ### Options
 # region
+GetRow = RowHandeler(2).GetRow
+
 sounds = Checkbutton(root, variable=soundsBool, text="Sound Files")
-sounds.grid(row=2, column=2, sticky="W")
+sounds.grid(row=GetRow(), column=2, sticky="W")
+
+shaders = Checkbutton(root, variable=shadersBool, text="Shader Files")
+shaders.grid(row=GetRow(), column=2, sticky="W")
 
 languages = Checkbutton(root, variable=languagesBool, text="Lang Files")
-languages.grid(row=3, column=2, sticky="W")
+languages.grid(row=GetRow(), column=2, sticky="W")
 
 realm = Checkbutton(root, variable=realmBool, text="Realm Files")
-realm.grid(row=4, column=2, sticky="W")
+realm.grid(row=GetRow(), column=2, sticky="W")
 
 compatibilityFixes = Checkbutton(root, variable=compatibilityBool, text="Compatibility Fixes")
-compatibilityFixes.grid(row=5, column=2, sticky="W")
+compatibilityFixes.grid(row=GetRow(), column=2, sticky="W")
 
 snapshots = Checkbutton(root, command=snapshotButton, variable=snapshotsBool, text="Is a Snapshot")
-snapshots.grid(row=6, column=2, sticky="W")
+snapshots.grid(row=GetRow(), column=2, sticky="W")
 
 packPNG = Checkbutton(root, command=packPNGButton, variable=packPNGBool, text="Custom Pack Image")
-packPNG.grid(row=7, column=2, sticky="W")
+packPNG.grid(row=GetRow(), column=2, sticky="W")
 
 autoPack = Checkbutton(root, command=packFormatButton, variable=autoPackBool, text="Auto Pack Format")
-autoPack.grid(row=8, column=2, sticky="W")
+autoPack.grid(row=GetRow(), column=2, sticky="W")
 
 zip = Checkbutton(root, command=zipButton, variable=zipBool, text="Zip Files")
-zip.grid(row=9, column=2, sticky="W")
+zip.grid(row=GetRow(), column=2, sticky="W")
 
 delete = Checkbutton(root, variable=deleteBool, text="Delete Folder After Zip")
-delete.grid(row=10, column=2, sticky="W")
+delete.grid(row=GetRow(), column=2, sticky="W")
 
 clear = Checkbutton(root, variable=clearBool, text="Clear Command Line")
-clear.grid(row=11, column=2, sticky="W")
+clear.grid(row=GetRow(), column=2, sticky="W")
 # endregion Options
 
 ### Bottom
