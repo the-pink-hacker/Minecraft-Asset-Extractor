@@ -18,10 +18,12 @@ def convertToRGB(r, g, b):
 	"""
 	return f"#{r:02x}{g:02x}{b:02x}"
 
+# When mouse is hovering over button
 def onEnter(e):
 	if e.widget["state"] == NORMAL:
 		e.widget["background"] = convertToRGB(220, 220, 220)
 
+# When mouse leaves button
 def onLeave(e):
     e.widget["background"] = "SystemButtonFace"
 
@@ -216,7 +218,7 @@ def loadSettings():
 	else:
 		read_config.read("default_settings.ini")
 
-	# The options on the right.
+	# The options on the right
 	if read_config.get("CheckBoxes", "snapshot") == "True":
 		snapshots.select()
 	else:
@@ -287,7 +289,7 @@ def loadSettings():
 	formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
 	packFormatButton()
 
-		# Settings
+	# Settings
 	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
 		settingsDefaultOutputLocation = desktopDir
 	else:
@@ -306,7 +308,7 @@ def saveSettings():
 	# Saves the last used settings
 	write_config = ConfigParser()
 
-	# The fields on the left.
+	# The fields on the left
 	write_config.add_section("Fields")
 	if outputLocation.get() != settingsDefaultOutputLocation:
 		write_config.set("Fields","output_location", outputLocation.get())
@@ -318,7 +320,7 @@ def saveSettings():
 	write_config.set("Fields","description", description.get())
 	write_config.set("Fields","pack_format", formatChoices.get())
 
-	# The options on the right.
+	# The options on the right
 	write_config.add_section("CheckBoxes")
 	write_config.set("CheckBoxes","snapshot", str(bool(snapshotsBool.get())))
 	write_config.set("CheckBoxes","png", str(bool(packPNGBool.get())))
@@ -343,7 +345,7 @@ def saveSettings():
 	write_config.write(cfgfile)
 	cfgfile.close()
 
-# Creates the available choices in the pack format drop down.
+# Creates the available choices in the pack format drop down
 packFormats = [
 "1",
 "2",
@@ -354,7 +356,7 @@ packFormats = [
 "7"
 ]
 
-# Creates the available choices in the snapshot letters drop down.
+# Creates the available choices in the snapshot letters drop down
 snapshotLetters = [
 "a",
 "b",
@@ -375,15 +377,15 @@ zipBool = IntVar()
 clearBool = IntVar()
 deleteBool = IntVar()
 
-# Sets defualt value.
+# Sets defualt value for the snapshot letter
 snapshotLetterSelection = StringVar(root)
 snapshotLetterSelection.set(snapshotLetters[0])
 
-# Sets defualt value.
+# Sets defualt value for pack format
 formatChoices = StringVar(root)
 formatChoices.set(packFormats[5])
 
-# Sets the info about the window.
+# Sets the info about the window
 root.focus_force()
 windowIcon = PhotoImage(file = "icon.png")
 root.title("Minecraft Asset Extractor")
@@ -432,7 +434,7 @@ snapshotText = Label(root, text="Snapshot Version:").grid(row=7, column=0, stick
 
 snapshotYearText = Label(root, text="Year:").place(x=0, y=205, anchor=W)
 snapshotYear = Entry(root, width=2)
-snapshotYear.insert(0, str(datetime.today().year)[-2:]) # I don't care that this is more robust than it needs to be.
+snapshotYear.insert(0, str(datetime.today().year)[-2:])
 snapshotYear.place(x=40, y=205, anchor=W)
 
 snapshotWeekText = Label(root, text="Week:").place(x=60, y=205, anchor=W)
@@ -516,6 +518,7 @@ def grabSettings(args):
 		except:
 			None
 
+# Saves settings every 5 seconds
 def saveSettingsClock(args):
 	while True:
 		sleep(5)

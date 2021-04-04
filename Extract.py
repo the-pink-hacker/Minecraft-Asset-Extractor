@@ -25,10 +25,12 @@ DELETE = False
 
 completed = 0
 
+# Clears the console
 def Clear(clear):
 	if clear == True:
 		os.system("cls")
 
+# Starts the extracting process
 def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, customPackPNG, Description, pack, autoPack, sounds, langBool, realmBool, zipFiles, compatibility, clear, delete):
 	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
@@ -53,10 +55,12 @@ def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, cu
 	thread = Thread(target = Extract, args = (0,))
 	thread.start()
 
+# Extracts a file that is not in the .jar
 def ExtractOBJ(args, src, dest):
 	os.makedirs(os.path.dirname(dest), exist_ok=True)
 	shutil.copyfile(src, dest)
 
+# Extracts a file from the .jar
 def ExtractJAR(args, zip, file):
 	global completed
 	os.makedirs(os.path.dirname(f"{OUTPUT_PATH}\\{PACK_NAME}\\{file}"), exist_ok=True)
@@ -83,6 +87,7 @@ def getListOfFiles(dirName):
 				
 	return allFiles
 
+# Prints a progress bar in the console
 def ProgressBar(message, current, total, barLength = 40):
 	percent = float(current) * 100 / total
 	arrow   = "\u25A0" * int(percent/100 * barLength - 1)
@@ -92,8 +97,8 @@ def ProgressBar(message, current, total, barLength = 40):
 		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent))
 	else:
 		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent), end='\r')
-	
-# This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory.
+
+# This is a heavly modified version of https://minecraft.gamepedia.com/Tutorials/Sound_directory
 def Extract(args):
 	global OUTPUT_PATH, PACK_NAME, MC_VERSION, SNAPSHOT, SNAPSHOT_BOOL, PACK_PNG, CUSTOM_PACK_PNG, DESCRIPTION, MC_PACK, AUTO_PACK, SOUNDS, LANGBOOL, REALMBOOL, ZIP_FILES, COMPATIBILITY, CLEAR, DELETE
 
@@ -125,7 +130,7 @@ def Extract(args):
 	if SNAPSHOT_BOOL:
 		MC_VERSION_SNAPSHOT = SNAPSHOT
 
-	# Finds the pack format that matches with the selected version.
+	# Finds the pack format that matches with the selected version
 	if AUTO_PACK == True:
 		if int(MC_VERSION.split(".")[1]) >= 17:
 			MC_PACK = 7
@@ -189,9 +194,9 @@ def Extract(args):
 	else:
 		MC_OBJECT_INDEX = f"""{MC_ASSETS}/indexes/{MC_VERSION.split(".")[0]}.{MC_VERSION.split(".")[1]}.json"""
 
-	# Where the unextracted asset files are.
+	# Where the unextracted asset files are
 	MC_OBJECTS_PATH = f"{MC_ASSETS}/objects"
-	# How it finds out weather it is an asset or somthing else.
+	# How it finds out weather it is an asset or somthing else
 	MC_SOUNDS = r"minecraft/"
 
 	Clear(CLEAR)
@@ -224,7 +229,7 @@ def Extract(args):
 							current += 1
 							ProgressBar("Extracting .jar Progress", current, length)
 							
-							# finds out what thread to use.
+							# Finds out what thread to use
 							currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
 							# Copy the file
@@ -234,13 +239,14 @@ def Extract(args):
 						current += 1
 						ProgressBar("Extracting .jar Progress", current, length)
 							
-						# finds out what thread to use.
+						# Finds out what thread to use
 						currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
 						# Copy the file
 						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
 						threadJAR.start()
 
+		# Waits for all threads to be complete
 		while completed != current:
 			time.sleep(0.1)
 
@@ -278,7 +284,7 @@ def Extract(args):
 				src_fpath = os.path.normpath(f"{MC_OBJECTS_PATH}/{fhash[:2]}/{fhash}")
 				dest_fpath = os.path.normpath(f"{OUTPUT_PATH}/{PACK_NAME}/assets/minecraft/{fpath}")
 
-				# finds out what thread to use.
+				# finds out what thread to use
 				if currentThread < os.cpu_count():
 					currentThread += 1
 				else:
@@ -309,6 +315,7 @@ def Extract(args):
 
 	print(f"\nExtracted All Assets To {os.path.normpath(f'{OUTPUT_PATH}//{PACK_NAME}')}\ \n")
 
+	# Handles zipping the files
 	if ZIP_FILES == False:
 		print("Finished.")
 	else:
@@ -336,6 +343,7 @@ def Extract(args):
 
 		Clear(CLEAR)
 
+		# Deletes unzipped files
 		if DELETE:
 			print("Cleaning Temp Files...")
 			shutil.rmtree(os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}"))
