@@ -239,6 +239,11 @@ def loadSettings():
 	else:
 		sounds.deselect()
 
+	if read_config.get("CheckBoxes", "shaders") == "True":
+		shaders.select()
+	else:
+		shaders.deselect()
+
 	if read_config.get("CheckBoxes", "languages") == "True":
 		languages.select()
 	else:
@@ -326,6 +331,7 @@ def saveSettings():
 	write_config.set("CheckBoxes","png", str(bool(packPNGBool.get())))
 	write_config.set("CheckBoxes","auto_pack", str(bool(autoPackBool.get())))
 	write_config.set("CheckBoxes","sounds", str(bool(soundsBool.get())))
+	write_config.set("CheckBoxes","shaders", str(bool(shadersBool.get())))
 	write_config.set("CheckBoxes","languages", str(bool(languagesBool.get())))
 	write_config.set("CheckBoxes","realm", str(bool(realmBool.get())))
 	write_config.set("CheckBoxes","zip", str(bool(zipBool.get())))
