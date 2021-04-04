@@ -72,7 +72,6 @@ def ExtractStart(outPath, packName, version, snapshot, snapshotBool, packPNG, cu
 	AUTO_PACK = autoPack
 	SOUNDS = sounds
 	SHADERSBOOL = shaders
-	print(shaders)
 	LANGBOOL = langBool
 	REALMBOOL = realmBool
 	ZIP_FILES = zipFiles
@@ -185,7 +184,7 @@ def Extract(args):
 		LANG = "null"
 
 	if REALMBOOL == False:
-		REALM = "realm"
+		REALM = "realms"
 	else:
 		REALM = "null"
 
@@ -233,11 +232,7 @@ def Extract(args):
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
 				if fileName.split("/")[1] != REALM and Check(fileName, SHADERS, 2):
-					if len(fileName.split("/")) >= 6:
-						if fileName.split("/")[5] != "background":
-							length += 1
-					else:
-						length += 1
+					length += 1
 
 		global completed
 
@@ -245,27 +240,15 @@ def Extract(args):
 		for fileName in listOfFileNames:
 			if fileName.startswith("assets"):
 				if fileName.split("/")[1] != REALM and Check(fileName, SHADERS, 2):
-					if len(fileName.split("/")) >= 6:
-						if fileName.split("/")[5] != "background":
-							current += 1
-							ProgressBar("Extracting .jar Progress", current, length)
+					current += 1
+					ProgressBar("Extracting .jar Progress", current, length)
 							
-							# Finds out what thread to use
-							currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
+					# Finds out what thread to use
+					currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
 
-							# Copy the file
-							threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
-							threadJAR.start()
-					else:
-						current += 1
-						ProgressBar("Extracting .jar Progress", current, length)
-							
-						# Finds out what thread to use
-						currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
-
-						# Copy the file
-						threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
-						threadJAR.start()
+					# Copy the file
+					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
+					threadJAR.start()
 
 		# Waits for all threads to be complete
 		while completed != current:
@@ -288,11 +271,11 @@ def Extract(args):
 		current = 0
 
 		for fpath, fhash in sounds.items():
-			if fpath == SOUND or fpath[0] == "t" or fpath == LANG:
+			if fpath.split("/")[0] == SOUND or fpath[0] == "t" or fpath.split("/")[0] == LANG:
 				length += 1
 
 		for fpath, fhash in sounds.items():
-			if fpath == SOUND or fpath[0] == "t" or fpath == LANG:
+			if fpath.split("/")[0] == SOUND or fpath[0] == "t" or fpath.split("/")[0] == LANG:
 				current += 1
 
 				if SOUNDS and LANGBOOL:
