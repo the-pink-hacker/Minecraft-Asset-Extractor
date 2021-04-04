@@ -1,4 +1,5 @@
 pyinstaller --icon=icon.ico Minecraft_Asset_Extractor.py, Extract.py
+Copy-Item config.json -Destination dist\Minecraft_Asset_Extractor\config.json
 Copy-Item icon.png -Destination dist\Minecraft_Asset_Extractor\icon.png
 Copy-Item default_settings.ini -Destination dist\Minecraft_Asset_Extractor\default_settings.ini
 Copy-Item LICENSE -Destination dist\Minecraft_Asset_Extractor\LICENSE.txt
