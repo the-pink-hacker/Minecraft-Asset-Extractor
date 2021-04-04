@@ -1,4 +1,5 @@
 {
+    "program_version": "V0.5.1 - Beta",
     "pack_format": [
         "1",
         "2",
@@ -13,5 +14,13 @@
         "b",
         "c",
         "d"
+    ],
+    "links": [
+        { "CurseForge": "https://www.curseforge.com/members/ryangar46/projects" },
+        { "GitHub": "https://github.com/RyanGar46" },
+        { "Minecraft Asset Extractor GitHub Page": "https://github.com/RyanGar46/Minecraft-Asset-Extractor" },
+        { "Planet Minecraft": "https://www.planetminecraft.com/member/ryangar46" },
+        { "Twitter": "https://twitter.com/RyanGar46" },
+        { "YouTube": "https://www.youtube.com/channel/UCa5CoSRScfDUtoEAenjbnZg" }
     ]
 }

@@ -7,7 +7,15 @@ from tkinter import *
 from tkinter import filedialog
 from datetime import datetime
 
-programVersion = "V0.5.0 - Beta"
+# Parses data from config.json
+configFile = open("config.json")
+configVaribles = json.load(configFile)
+configFile.close()
+
+programVersion = configVaribles["program_version"]
+
+packFormats = configVaribles["pack_format"]
+snapshotLetters = configVaribles["snapshot_letters"]
 
 desktopDir = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
@@ -157,6 +165,24 @@ def settingsUI():
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
 
+# Takes an array of links and converts them into lables
+def generateLinks(window, links, startingRow):
+	for index in range(len(links)):
+		# Parses names and urls
+		link = str(links[index])
+		link = link.replace("{", "")
+		link = link.replace("'", "")
+		link = link.replace("}", "")
+		link = link.split(": ")
+
+		name = link[0]
+		url = link[1]
+
+		# Creates lable
+		linkText = Label(window, text=name, fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+		linkText.grid(row=index + startingRow, column=0, sticky="W")
+		linkText.bind("<Button-1>", lambda e: callback(url))
+
 def aboutUI():
 	about = Toplevel(root)
 
@@ -174,29 +200,7 @@ def aboutUI():
 	aboutText = Label(about, text="Ryan Garret (RyanGar46):")
 	aboutText.grid(row=1, column=0, sticky="W")
 
-	github = Label(about, text="GitHub", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	github.grid(row=2, column=0, sticky="W")
-	github.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46"))
-
-	githubProject = Label(about, text="Minecraft Asset Extractor Github Page", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	githubProject.grid(row=3, column=0, sticky="W")
-	githubProject.bind("<Button-1>", lambda e: callback("https://github.com/RyanGar46/Minecraft-Asset-Extractor"))
-
-	twitter = Label(about, text="Twitter", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	twitter.grid(row=4, column=0, sticky="W")
-	twitter.bind("<Button-1>", lambda e: callback("https://twitter.com/RyanGar46"))
-
-	youtube = Label(about, text="YouTube", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	youtube.grid(row=5, column=0, sticky="W")
-	youtube.bind("<Button-1>", lambda e: callback("https://www.youtube.com/channel/UCa5CoSRScfDUtoEAenjbnZg"))
-
-	curseforge = Label(about, text="CurseForge", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	curseforge.grid(row=6, column=0, sticky="W")
-	curseforge.bind("<Button-1>", lambda e: callback("https://www.curseforge.com/members/ryangar46/projects"))
-
-	planetMC = Label(about, text="Planet Minecraft", fg="blue", cursor="hand2", font=('Arial',9,'underline'))
-	planetMC.grid(row=7, column=0, sticky="W")
-	planetMC.bind("<Button-1>", lambda e: callback("https://www.planetminecraft.com/member/ryangar46"))
+	generateLinks(about, configVaribles["links"], 2)
 
 	version = Label(about, text=programVersion)
 	version.place(relx=0.0, rely=1.0, anchor="sw")
@@ -344,15 +348,6 @@ def saveSettings():
 	cfgfile = open("settings.ini",'w')
 	write_config.write(cfgfile)
 	cfgfile.close()
-
-# Parses data from config.json
-configFile = open("config.json")
-configVaribles = json.load(configFile)
-configFile.close()
-
-packFormats = configVaribles["pack_format"]
-
-snapshotLetters = configVaribles["snapshot_letters"]
 
 root = Tk()
 
