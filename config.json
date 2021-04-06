@@ -1,5 +1,9 @@
 {
-    "program_version": "V0.5.1 - Beta",
+    "program_info": [
+        { "title": "Minecraft Asset Extractor" },
+        { "author": "Ryan Garrett" },
+        { "version": "V0.5.1 - Beta" }
+    ],
     "pack_format": [
         "1",
         "2",

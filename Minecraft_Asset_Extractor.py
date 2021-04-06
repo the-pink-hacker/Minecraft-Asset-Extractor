@@ -13,14 +13,24 @@ configFile = open("config.json")
 configVaribles = json.load(configFile)
 configFile.close()
 
-programVersion = configVaribles["program_version"]
-
 packFormats = configVaribles["pack_format"]
 snapshotLetters = configVaribles["snapshot_letters"]
 
 desktopDir = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
 settingsDefaultOutputLocation = desktopDir
+
+def parseNestedArray(text):
+	text = str(text)
+	text = text.replace("{", "")
+	text = text.replace("'", "")
+	text = text.replace("}", "")
+	text = text.split(": ")
+	return text
+
+programTitle = parseNestedArray(configVaribles["program_info"][0])[1]
+author = parseNestedArray(configVaribles["program_info"][1])[1]
+programVersion = parseNestedArray(configVaribles["program_info"][2])[1]
 
 # Helps automate the placement of lables
 class RowHandeler:
@@ -129,12 +139,7 @@ def closeWindow(window):
 	root.focus_force()
 
 def generateLink(window, link, GetRow):
-	# Parses names and urls
-	link = str(link)
-	link = link.replace("{", "")
-	link = link.replace("'", "")
-	link = link.replace("}", "")
-	link = link.split(": ")
+	link = parseNestedArray(link)
 
 	name = link[0]
 	url = link[1]
@@ -154,7 +159,7 @@ def introUI():
 	intro.geometry("400x300")
 	intro.resizable(False, False)
 
-	settingsTitleText = Label(intro, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+	settingsTitleText = Label(intro, text=f"{programTitle}\nBy: {author}")
 	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
 	GetRow = RowHandeler(0).GetRow
@@ -180,7 +185,7 @@ def settingsUI():
 	setting.geometry("400x300")
 	setting.resizable(False, False)
 
-	settingsTitleText = Label(setting, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+	settingsTitleText = Label(setting, text=f"{programTitle}\nBy: {author}")
 	settingsTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
 	GetRow = RowHandeler(0).GetRow
@@ -233,14 +238,14 @@ def aboutUI():
 	about.geometry("400x300")
 	about.resizable(False, False)
 
-	aboutTitleText = Label(about, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+	aboutTitleText = Label(about, text="{programTitle}\nBy: {author}")
 	aboutTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
 	GetRow = RowHandeler(0).GetRow
 
 	spacer = Label(about, text="", pady=10).grid(row=GetRow(), column=0, sticky="N")
 
-	aboutText = Label(about, text="Ryan Garret (RyanGar46):")
+	aboutText = Label(about, text="{author} (RyanGar46):")
 	aboutText.grid(row=GetRow(), column=0, sticky="W")
 
 	generateLinks(about, configVaribles["links"], GetRow)
@@ -426,7 +431,7 @@ formatChoices.set(packFormats[5])
 # Sets the info about the window
 root.focus_force()
 windowIcon = PhotoImage(file = "icon.png")
-root.title("Minecraft Asset Extractor")
+root.title(programTitle)
 root.iconphoto(False, windowIcon)
 root.minsize(550, 375)
 
@@ -434,7 +439,7 @@ root.minsize(550, 375)
 # region
 GetRow = RowHandeler(0).GetRow
 
-titleText = Label(root, text="Minecraft Asset Extractor\nBy: Ryan Garrett")
+titleText = Label(root, text=f"{programTitle}\nBy: {author}")
 titleText.place(relx=0.5, rely=0.0, anchor="n")
 
 settings = Button(root, text="Settings", command=settingsUI, relief="flat")
