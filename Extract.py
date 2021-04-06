@@ -140,17 +140,19 @@ def Extract(args):
 
 	Clear(CLEAR)
 
+	# Errors & Warrnings
 	if OUTPUT_PATH.replace(" ", "") == "":
-		print("No output path provided.")
+		print("Error: No output path provided.")
 		return
 	if PACK_NAME.replace(" ", "") == "":
-		print("Warning, no name provided.")
+		print("Warning: no name provided.")
 		PACK_NAME = "Minecraft Resources"
 	if MC_VERSION.replace(" ", "") == "":
-		print("No version provided.")
+		print("Error: No version provided.")
 		return
 	if PACK_PNG.replace(" ", "") == "" and CUSTOM_PACK_PNG == True:
-		print("Warning, no image provided.")
+		print("Warning: no image provided.")
+
 	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
 		PACK_PNG = "icon.png"
 	else:
@@ -158,7 +160,7 @@ def Extract(args):
 		width, height = image.size
 		image.close()
 		if image.size[0] != image.size[1]:
-			print("Image needs to be 1/1 aspect ratio.")
+			print("Error: Image needs to be 1/1 aspect ratio.")
 			return
 
 	MC_VERSION_SNAPSHOT = MC_VERSION
@@ -201,6 +203,14 @@ def Extract(args):
 		MC_ASSETS = os.path.expanduser("~\\.minecraft\\assets")
 		MC_VERSION_JAR = os.path.expanduser(f"~\\.minecraft\\versions\\{MC_VERSION_SNAPSHOT}\\{MC_VERSION_SNAPSHOT}.jar")
 
+	# Errors
+	if not os.path.exists(MC_ASSETS):
+		print("Error: Minecraft not found.")
+		return
+	if not os.path.exists(MC_VERSION_JAR):
+		print("Error: Minecraft version can not be found. Check to see if the version is installed, or if you typed the right version.")
+		return
+
 	# Compatibility fixes
 	if COMPATIBILITY == True:
 		if int(MC_VERSION.split(".")[1]) == 13:
@@ -222,7 +232,6 @@ def Extract(args):
 	Clear(CLEAR)
 
 	if os.path.exists(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}")) and not ZIP_FILES:
-		print("Removed")
 		shutil.rmtree(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}"))
 	elif os.path.exists(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")) and ZIP_FILES:
 		os.remove(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"))
