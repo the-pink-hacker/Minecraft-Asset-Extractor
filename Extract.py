@@ -221,6 +221,12 @@ def Extract(args):
 
 	Clear(CLEAR)
 
+	if os.path.exists(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}")) and not ZIP_FILES:
+		print("Removed")
+		shutil.rmtree(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}"))
+	elif os.path.exists(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip")) and ZIP_FILES:
+		os.remove(os.path.normpath(f"{REAL_OUTPUT_PATH}\\{PACK_NAME}.zip"))
+
 	# Opens the .jar
 	with ZipFile(MC_VERSION_JAR, 'r') as zip:
 		# Get a list of all archived file names from the zip
