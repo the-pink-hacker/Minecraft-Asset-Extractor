@@ -257,9 +257,14 @@ def Extract(args):
 				if fileName.split("/")[1] != REALM and Check(fileName, SHADERS, 2):
 					current += 1
 					ProgressBar("Extracting .jar Progress", current, length)
-							
+					
+					currentThread = 0
+					
 					# Finds out what thread to use
-					currentThread = round((os.cpu_count() - 1) * (current / length)) + 1
+					if currentThread < os.cpu_count():
+						currentThread += 1
+					else:
+						currentThread = 1
 
 					# Copy the file
 					threadJAR = Thread(target = ExtractJAR, args = (currentThread, zip, fileName))
