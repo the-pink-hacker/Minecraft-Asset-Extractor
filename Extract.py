@@ -126,8 +126,8 @@ def ProgressBar(message, current, total, barLength = 40):
 		print(f"  | %s%s| %d %% {message}" % (arrow, spaces, percent), end='\r')
 
 def Check(fileName, text, index):
-	if (len(fileName.split("/")) >= index + 1):
-		if (fileName.split("/")[index] == text):
+	if len(fileName.split("/")) >= index + 1:
+		if fileName.split("/")[index] == text:
 			return False
 		else:
 			return True

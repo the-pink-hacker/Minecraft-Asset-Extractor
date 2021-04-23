@@ -18,7 +18,47 @@ snapshotLetters = configVaribles["snapshot_letters"]
 
 desktopDir = os.path.normpath(os.path.expandvars(os.path.expanduser(r"~/Desktop/")))
 
-settingsDefaultOutputLocation = desktopDir
+class Settings:
+	"""A class that stores all settings.
+	"""
+
+	# Fields
+	output_location = ""
+	name = ""
+	version = ""
+	pngDir = ""
+	description = ""
+	pack_format = 0
+
+	# Check Boxes
+	snapshot = False
+	png = False
+	auto_pack = False
+	sounds = False
+	shaders = False
+	languages = False
+	realm = False
+	zip = False
+	compatibility = False
+	clear = False
+	delete = False
+
+	# Settings
+	default_output_location = ""
+	intro_screen = False
+
+	def __str__(self):
+		return f"""Fields
+Output Location: {self.output_location}\nName: {self.name}\nVersion: {self.version}\nPNG Location: {self.pngDir}\nDescription: {self.description}\nPack Format {self.pack_format}
+
+Check Boxes
+Snapshot: {self.snapshot}\nPNG: {self.png}\nAuto Pack: {self.auto_pack}\nSounds: {self.sounds}\nShaders: {self.shaders}\nLanguages: {self.languages}\nRealm: {self.realm}\nZip: {self.zip}
+Compatibility: {self.compatibility}\nClear: {self.clear}\nDelete: {self.delete}
+
+Settings
+Default Output Location: {self.default_output_location}\nIntro Screen: {self.intro_screen}"""
+
+options = Settings()
 
 def parseNestedArray(text):
 	text = str(text)
@@ -32,20 +72,21 @@ programTitle = parseNestedArray(configVaribles["program_info"][0])[1]
 author = parseNestedArray(configVaribles["program_info"][1])[1]
 programVersion = parseNestedArray(configVaribles["program_info"][2])[1]
 
-# Helps automate the placement of lables
 class RowHandeler:
+	"""Helps automate the placement of lables.
+	"""
 	def __init__(self, startingRow):
 		self.currentRow = startingRow - 1
 
 	def GetRow(self, keepRow = False):
-		if (keepRow == False):
+		if keepRow == False:
 			self.currentRow += 1
 
 		return self.currentRow
 
 def versionCheck(var = None, indx = None, mode = None):
 	try:
-		if (AutoPack(minecraftVersion.get()) >= 5):
+		if AutoPack(minecraftVersion.get() >= 5):
 			shaders.configure(state="normal")
 		else:
 			shaders.configure(state="disabled")
@@ -53,7 +94,7 @@ def versionCheck(var = None, indx = None, mode = None):
 		None
 
 def convertToRGB(r, g, b):
-	"""translates rgb to a tkinter friendly color code
+	"""Translates rgb to a tkinter friendly color code.
 	"""
 	return f"#{r:02x}{g:02x}{b:02x}"
 
@@ -176,7 +217,11 @@ def introUI():
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
 
-def settingsUI():
+def closeSettings(window, settings, options):
+	settings.default_output_location = options[0]
+	closeWindow(window)
+
+def settingsUI(settings):
 	setting = Toplevel(root)
 
 	setting.focus_force()
@@ -192,13 +237,11 @@ def settingsUI():
 
 	spacer = Label(setting, text="", pady=10).grid(row=GetRow(), column=0, sticky="NW")
 
-	global defaultOutputLocation
-
 	outputLocationText = Label(setting, text="Default Output Location:").grid(row=GetRow(), column=0, sticky="W")
 	defaultOutputLocation = Entry(setting, width=50)
-	defaultOutputLocation.insert(0, settingsDefaultOutputLocation)
+	defaultOutputLocation.insert(0, settings.default_output_location)
 	defaultOutputLocation.grid(row=GetRow(), column=0, sticky="W")
-	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation), relief="flat")
+	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, settings.default_output_location), relief="flat")
 	outputLocationButton.grid(row=GetRow(True), column=1)
 	outputLocationButton.bind("<Enter>", onEnter)
 	outputLocationButton.bind("<Leave>", onLeave)
@@ -206,7 +249,7 @@ def settingsUI():
 	settingsVersion = Label(setting, text=programVersion)
 	settingsVersion.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(setting, text="Close", command=lambda:closeWindow(setting), relief="flat")
+	closeButton = Button(setting, text="Close", command=lambda:closeSettings(setting, settings, [defaultOutputLocation.get()]), relief="flat")
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
@@ -260,7 +303,7 @@ def aboutUI():
 
 	about.mainloop()
 
-def loadSettings():
+def loadSettings(settings):
 	global settingsDefaultOutputLocation
 
 	read_config = ConfigParser()
@@ -272,102 +315,135 @@ def loadSettings():
 
 	# The options on the right
 	if read_config.get("CheckBoxes", "snapshot") == "True":
+		settings.snapshot = True
 		snapshots.select()
 	else:
+		settings.snapshot = False
 		snapshots.deselect()
 
 	if read_config.get("CheckBoxes", "png") == "True":
+		settings.png = True
 		packPNG.select()
 	else:
+		settings.png = False
 		packPNG.deselect()
 
 	if read_config.get("CheckBoxes", "auto_pack") == "True":
+		settings.auto_pack = True
 		autoPack.select()
 	else:
+		settings.auto_pack = False
 		autoPack.deselect()
 
 	if read_config.get("CheckBoxes", "sounds") == "True":
+		settings.sounds = True
 		sounds.select()
 	else:
+		settings.sounds = False
 		sounds.deselect()
 
 	if read_config.get("CheckBoxes", "shaders") == "True":
+		settings.shaders = True
 		shaders.select()
 	else:
+		settings.shaders = False
 		shaders.deselect()
 
 	if read_config.get("CheckBoxes", "languages") == "True":
+		settings.languages = True
 		languages.select()
 	else:
+		settings.languages = False
 		languages.deselect()
 
 	if read_config.get("CheckBoxes", "realm") == "True":
+		settings.realm = True
 		realm.select()
 	else:
+		settings.realm = False
 		realm.deselect()
 
 	if read_config.get("CheckBoxes", "compatibility") == "True":
+		settings.compatibility = True
 		compatibilityFixes.select()
 	else:
+		settings.compatibility = False
 		compatibilityFixes.deselect()
 
 	if read_config.get("CheckBoxes", "clear") == "True":
+		settings.clear = True
 		clear.select()
 	else:
+		settings.clear = False
 		delete.deselect()
 
 	if read_config.get("CheckBoxes", "zip") == "True":
+		settings.zip = True
 		zip.select()
 	else:
+		settings.zip = False
 		zip.deselect()
 
 	if read_config.get("CheckBoxes", "delete") == "True":
+		settings.delete = True
 		delete.select()
 	else:
+		settings.delete = False
 		delete.deselect()
 	zipButton()
 
 	# The fields on the left.
 	outputLocation.delete(0, END)
-	if read_config.get("Fields", "output_location").replace(" ", "") == "":
+	outputLocationField = read_config.get("Fields", "output_location")
+	if outputLocationField.replace(" ", "") == "":
 		outputLocation.insert(0, desktopDir)
+		settings.output_location = desktopDir
 	else:
-		outputLocation.insert(0, read_config.get("Fields", "output_location"))
+		outputLocation.insert(0, outputLocationField)
+		settings.output_location = outputLocationField
 	packName.delete(0, END)
 	packName.insert(0, read_config.get("Fields", "name"))
+	settings.name = read_config.get("Fields", "name")
 	minecraftVersion.delete(0, END)
 	minecraftVersion.insert(0, read_config.get("Fields", "version"))
+	settings.version = read_config.get("Fields", "version")
 	snapshotButton()
 	packPNGSelect.delete(0, END)
 	packPNGSelect.insert(0, read_config.get("Fields", "png"))
+	settings.pngDir = read_config.get("Fields", "png")
 	packPNGButton()
 	description.delete(0, END)
 	description.insert(0, read_config.get("Fields", "description"))
+	settings.description = read_config.get("Fields", "description")
 	formatChoices.set(packFormats[packFormats.index(read_config.get("Fields", "pack_format"))])
+	settings.pack_format = int(read_config.get("Fields", "pack_format"))
 	packFormatButton()
 
 	# Settings
 	if read_config.get("Settings", "default_output_location").replace(" ", "") == "":
 		settingsDefaultOutputLocation = desktopDir
+		settings.default_output_location = desktopDir
 	else:
 		settingsDefaultOutputLocation = read_config.get("Settings", "default_output_location")
 		outputLocation.delete(0, END)
 		outputLocation.insert(0, read_config.get("Settings", "default_output_location"))
+		settings.default_output_location = read_config.get("Settings", "default_output_location")
 
 	if read_config.get("Settings", "intro_screen") == "True":
+		settings.intro_screen = read_config.get("Settings", "intro_screen")
 		introUI()
 
-def on_closing():
-	saveSettings()
+def on_closing(settings):
+	saveSettings(settings)
 	root.destroy()
 
-def saveSettings():
+def saveSettings(settings):
 	# Saves the last used settings
 	write_config = ConfigParser()
 
 	# The fields on the left
 	write_config.add_section("Fields")
-	if outputLocation.get() != settingsDefaultOutputLocation:
+	if outputLocation.get() != settings.default_output_location:
 		write_config.set("Fields","output_location", outputLocation.get())
 	else:
 		write_config.set("Fields","output_location", "")
@@ -394,7 +470,7 @@ def saveSettings():
 	# Extra settings
 	write_config.add_section("Settings")
 	if settingsDefaultOutputLocation != desktopDir:
-		write_config.set("Settings","default_output_location", settingsDefaultOutputLocation)
+		write_config.set("Settings","default_output_location", settings.default_output_location)
 	else:
 		write_config.set("Settings","default_output_location", "")
 	write_config.set("Settings","intro_screen", "False")
@@ -442,7 +518,7 @@ GetRow = RowHandeler(0).GetRow
 titleText = Label(root, text=f"{programTitle}\nBy: {author}")
 titleText.place(relx=0.5, rely=0.0, anchor="n")
 
-settings = Button(root, text="Settings", command=settingsUI, relief="flat")
+settings = Button(root, text="Settings", command=lambda: settingsUI(options), relief="flat")
 settings.grid(row=GetRow(), column=0, sticky=NW)
 settings.bind("<Enter>", onEnter)
 settings.bind("<Leave>", onLeave)
@@ -555,34 +631,21 @@ extractButton.bind("<Enter>", onEnter)
 extractButton.bind("<Leave>", onLeave)
 # endregion
 
-loadSettings()
+loadSettings(options)
 
-root.protocol("WM_DELETE_WINDOW", on_closing)
-
-def grabSettings(args):
-	sleep(1)
-	while True:
-		sleep(1)
-		try:
-			global settingsDefaultOutputLocation
-			settingsDefaultOutputLocation = defaultOutputLocation.get()
-		except:
-			None
+root.protocol("WM_DELETE_WINDOW", lambda: on_closing(options))
 
 # Saves settings every 5 seconds
 def saveSettingsClock(args):
 	while True:
 		sleep(5)
 		try:
-			saveSettings()
+			saveSettings(options)
 		except:
 			None
 
-thread = Thread(target = grabSettings, args = (1,))
+thread = Thread(target = saveSettingsClock, args = (1,))
 thread.start()
-
-thread2 = Thread(target = saveSettingsClock, args = (1,))
-thread2.start()
 
 root.mainloop()
 
