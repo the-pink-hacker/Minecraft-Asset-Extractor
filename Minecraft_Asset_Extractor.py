@@ -46,6 +46,7 @@ class Settings:
 	# Settings
 	default_output_location = ""
 	intro_screen = False
+	tempDir = "temp"
 
 	def __str__(self):
 		return f"""Fields
@@ -56,7 +57,7 @@ Snapshot: {self.snapshot}\nPNG: {self.png}\nAuto Pack: {self.auto_pack}\nSounds:
 Compatibility: {self.compatibility}\nClear: {self.clear}\nDelete: {self.delete}
 
 Settings
-Default Output Location: {self.default_output_location}\nIntro Screen: {self.intro_screen}"""
+Default Output Location: {self.default_output_location}\nIntro Screen: {self.intro_screen}\nTemp Dir: {tempDir}"""
 
 options = Settings()
 
@@ -132,12 +133,12 @@ def extract():
 	bool(clearBool.get()), # Clear command line
 	bool(deleteBool.get())) # Delets folder after zipping
 
-def openFolder(parent, outputLocation):
-	folder = filedialog.askdirectory(parent=parent,initialdir=os.path.normpath("C://"), title="Select Output Location")
+def openFolder(parent, entry, initialdir = "C://"):
+	folder = filedialog.askdirectory(parent=parent,initialdir=os.path.abspath(os.path.normpath(initialdir)), title="Select Output Location")
 	
 	if folder != "":
-		outputLocation.delete(0, END)
-		outputLocation.insert(0, folder)
+		entry.delete(0, END)
+		entry.insert(0, folder)
 
 def openFile():
 	folder = filedialog.askopenfilename(initialdir=os.path.normpath("C://"), title="Select File", filetypes =(("PNG", "*.png"),("All Files","*.*")))
@@ -183,14 +184,12 @@ def closeWindow(window):
 	window.destroy()
 	root.focus_force()
 
-def generateLink(window, link, GetRow):
-	link = parseNestedArray(link)
+def generateLink(window, link, text, GetRow):
 
-	name = link[0]
-	url = link[1]
+	url = parseNestedArray(link)
 
 	# Creates lable
-	linkText = Label(window, text=name, fg="blue", cursor="hand2", font=('Arial',9,'underline'))
+	linkText = Label(window, text=text, fg="blue", cursor="hand2", font=('Arial',9,'underline'))
 	linkText.bind("<Button-1>", lambda e: callback(url))
 
 	return linkText
@@ -211,7 +210,7 @@ def introUI():
 
 	spacer = Label(intro, text="", pady=10).grid(row=GetRow(), column=0, sticky="NW")
 
-	generateLink(intro, configVaribles["links"][2], GetRow).place(relx=0.5, rely=0.5, anchor="center")
+	generateLink(intro, configVaribles["links"]["Source Code"], "Github Page", GetRow).place(relx=0.5, rely=0.5, anchor="center")
 
 	introVersion = Label(intro, text=programVersion)
 	introVersion.place(relx=0.0, rely=1.0, anchor="sw")
@@ -223,6 +222,7 @@ def introUI():
 
 def closeSettings(window, settings, options):
 	settings.default_output_location = options[0]
+	settings.tempDir = options[1]
 	closeWindow(window)
 
 def settingsUI(settings):
@@ -245,15 +245,24 @@ def settingsUI(settings):
 	defaultOutputLocation = Entry(setting, width=50)
 	defaultOutputLocation.insert(0, settings.default_output_location)
 	defaultOutputLocation.grid(row=GetRow(), column=0, sticky="W")
-	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, settings.default_output_location), relief="flat")
+	outputLocationButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, defaultOutputLocation, settings.default_output_location), relief="flat")
 	outputLocationButton.grid(row=GetRow(True), column=1)
 	outputLocationButton.bind("<Enter>", onEnter)
 	outputLocationButton.bind("<Leave>", onLeave)
 
+	tempDirText = Label(setting, text="Temp Directory:").grid(row=GetRow(), column=0, sticky="W")
+	tempDir = Entry(setting, width=50)
+	tempDir.insert(0, os.path.abspath(settings.tempDir))
+	tempDir.grid(row=GetRow(), column=0, sticky="W")
+	tempDirButton = Button(setting, text="Select Folder", command=lambda:openFolder(setting, tempDir, settings.tempDir), relief="flat")
+	tempDirButton.grid(row=GetRow(True), column=1)
+	tempDirButton.bind("<Enter>", onEnter)
+	tempDirButton.bind("<Leave>", onLeave)
+
 	settingsVersion = Label(setting, text=programVersion)
 	settingsVersion.place(relx=0.0, rely=1.0, anchor="sw")
 
-	closeButton = Button(setting, text="Close", command=lambda:closeSettings(setting, settings, [defaultOutputLocation.get()]), relief="flat")
+	closeButton = Button(setting, text="Close", command=lambda:closeSettings(setting, settings, [defaultOutputLocation.get(), tempDir.get()]), relief="flat")
 	closeButton.place(relx=1.0, rely=1.0, anchor="se")
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
@@ -432,6 +441,7 @@ def loadSettings(settings):
 	if read_config.get("Settings", "intro_screen") == "True":
 		settings.intro_screen = read_config.get("Settings", "intro_screen")
 		introUI()
+	settings.tempDir = read_config.get("Settings", "temp_dir")
 
 def on_closing(settings):
 	saveSettings(settings)
@@ -473,7 +483,9 @@ def saveSettings(settings):
 		write_config.set("Settings","default_output_location", settings.default_output_location)
 	else:
 		write_config.set("Settings","default_output_location", "")
+	#write_config.set("Settings","intro_screen", settings.intro_screen)
 	write_config.set("Settings","intro_screen", "False")
+	write_config.set("Settings", "temp_dir", settings.tempDir)
 
 	cfgfile = open("settings.ini",'w')
 	write_config.write(cfgfile)

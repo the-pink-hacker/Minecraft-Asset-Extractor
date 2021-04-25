@@ -4,6 +4,7 @@ from pathlib import Path
 from threading import Thread
 import array as arr
 from PIL import Image
+from configparser import *
 
 OUTPUT_PATH = ""
 PACK_NAME = ""
@@ -140,12 +141,19 @@ def Extract(args):
 
 	Clear(CLEAR)
 
-	# real out path = where the zip/folder ends up.
-	# out path = where the files are extracted to.
+	read_config = ConfigParser()
+
+	if os.path.exists("settings.ini"):
+		read_config.read("settings.ini")
+	else:
+		read_config.read("default_settings.ini")
+
+	# real output path = where the zip/folder ends up.
+	# output path = where the files are extracted to.
 	REAL_OUTPUT_PATH = OUTPUT_PATH
 
 	if ZIP_FILES == True and DELETE == True:
-		OUTPUT_PATH = os.path.abspath(os.path.normpath("temp"))
+		OUTPUT_PATH = os.path.abspath(os.path.normpath(read_config.get("Settings", "temp_dir")))
 
 	# Errors & Warrnings
 	if OUTPUT_PATH.replace(" ", "") == "":
