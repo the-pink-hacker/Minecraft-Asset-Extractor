@@ -1,9 +1,10 @@
 {
-    "program_info": [
-        { "title": "Minecraft Asset Extractor" },
-        { "author": "Ryan Garrett" },
-        { "version": "v0.6 - Beta" }
-    ],
+    "program_info": {
+        "title": "Minecraft Asset Extractor",
+        "author": "Ryan Garrett",
+        "version": "v0.6 - Beta",
+        "icon": "icon.ico"
+    },
     "pack_format": [
         "1",
         "2",
@@ -19,12 +20,12 @@
         "c",
         "d"
     ],
-    "links": [
-        { "CurseForge": "https://www.curseforge.com/members/ryangar46/projects" },
-        { "GitHub": "https://github.com/RyanGar46" },
-        { "Minecraft Asset Extractor GitHub Page": "https://github.com/RyanGar46/Minecraft-Asset-Extractor" },
-        { "Planet Minecraft": "https://www.planetminecraft.com/member/ryangar46" },
-        { "Twitter": "https://twitter.com/RyanGar46" },
-        { "YouTube": "https://www.youtube.com/channel/UCa5CoSRScfDUtoEAenjbnZg" }
-    ]
+    "links": {
+        "CurseForge": "https://www.curseforge.com/members/ryangar46/projects",
+        "GitHub": "https://github.com/RyanGar46",
+        "Minecraft Asset Extractor GitHub Page": "https://github.com/RyanGar46/Minecraft-Asset-Extractor",
+        "Planet Minecraft": "https://www.planetminecraft.com/member/ryangar46",
+        "Twitter": "https://twitter.com/RyanGar46",
+        "YouTube": "https://www.youtube.com/channel/UCa5CoSRScfDUtoEAenjbnZg"
+    }
 }

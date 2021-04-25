@@ -60,17 +60,20 @@ Default Output Location: {self.default_output_location}\nIntro Screen: {self.int
 
 options = Settings()
 
-def parseNestedArray(text):
-	text = str(text)
-	text = text.replace("{", "")
-	text = text.replace("'", "")
-	text = text.replace("}", "")
-	text = text.split(": ")
-	return text
+def parseNestedArray(array):
+	array = str(array)
+	array = array.replace("{", "")
+	array = array.replace("}", "")
+	array = array.replace("'", "")
+	array = array.split(", ")
 
-programTitle = parseNestedArray(configVaribles["program_info"][0])[1]
-author = parseNestedArray(configVaribles["program_info"][1])[1]
-programVersion = parseNestedArray(configVaribles["program_info"][2])[1]
+	for index in range(len(array)):
+		array[index] = array[index].split(":")
+	return array
+
+programTitle = parseNestedArray(configVaribles["program_info"])[0][1]
+author = parseNestedArray(configVaribles["program_info"])[1][1]
+programVersion = parseNestedArray(configVaribles["program_info"])[2][1]
 
 class RowHandeler:
 	"""Helps automate the placement of lables.
@@ -254,18 +257,14 @@ def settingsUI(settings):
 	closeButton.bind("<Enter>", onEnter)
 	closeButton.bind("<Leave>", onLeave)
 
-# Takes an array of links and converts them into lables
 def generateLinks(window, links, GetRow):
-	for index in range(len(links)):
-		# Parses names and urls
-		link = str(links[index])
-		link = link.replace("{", "")
-		link = link.replace("'", "")
-		link = link.replace("}", "")
-		link = link.split(": ")
+	'''Takes an array of links and converts them into lables
+	'''
+	links = parseNestedArray(links)
 
-		name = link[0]
-		url = link[1]
+	for index in range(len(links)):
+		name = links[index][0]
+		url = links[index][1]
 
 		# Creates lable
 		linkText = Label(window, text=name, fg="blue", cursor="hand2", font=('Arial',9,'underline'))
@@ -281,14 +280,14 @@ def aboutUI():
 	about.geometry("400x300")
 	about.resizable(False, False)
 
-	aboutTitleText = Label(about, text="{programTitle}\nBy: {author}")
+	aboutTitleText = Label(about, text=f"{programTitle}\nBy: {author}")
 	aboutTitleText.place(relx=0.5, rely=0.0, anchor="n")
 
 	GetRow = RowHandeler(0).GetRow
 
 	spacer = Label(about, text="", pady=10).grid(row=GetRow(), column=0, sticky="N")
 
-	aboutText = Label(about, text="{author} (RyanGar46):")
+	aboutText = Label(about, text=f"{author} (RyanGar46):")
 	aboutText.grid(row=GetRow(), column=0, sticky="W")
 
 	generateLinks(about, configVaribles["links"], GetRow)
