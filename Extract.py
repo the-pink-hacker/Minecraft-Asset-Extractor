@@ -140,6 +140,13 @@ def Extract(args):
 
 	Clear(CLEAR)
 
+	# real out path = where the zip/folder ends up.
+	# out path = where the files are extracted to.
+	REAL_OUTPUT_PATH = OUTPUT_PATH
+
+	if ZIP_FILES == True and DELETE == True:
+		OUTPUT_PATH = os.path.abspath(os.path.normpath("temp"))
+
 	# Errors & Warrnings
 	if OUTPUT_PATH.replace(" ", "") == "":
 		print("Error: No output path provided.")
@@ -154,7 +161,7 @@ def Extract(args):
 		print("Warning: no image provided.")
 
 	if CUSTOM_PACK_PNG == False or CUSTOM_PACK_PNG == None or PACK_PNG.replace(" ", "") == "":
-		PACK_PNG = "icon.png"
+		PACK_PNG = os.path.normpath(f"{OUTPUT_PATH}\\{PACK_NAME}\\assets\\minecraft\\textures\\misc\\unknown_pack.png")
 	else:
 		image = Image.open(PACK_PNG)
 		width, height = image.size
@@ -189,11 +196,6 @@ def Extract(args):
 		REALM = "realms"
 	else:
 		REALM = "null"
-
-	REAL_OUTPUT_PATH = OUTPUT_PATH
-
-	if ZIP_FILES == True and DELETE == True:
-		OUTPUT_PATH = os.path.join(os.path.abspath(os.path.join(__file__, os.pardir)), "temp\\")
 
 	Clear(CLEAR)
 	if platform.system() == "Windows":

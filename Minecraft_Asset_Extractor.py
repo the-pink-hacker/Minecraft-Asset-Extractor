@@ -196,7 +196,7 @@ def introUI():
 
 	intro.focus_force()
 	intro.title("Introduction Screen")
-	intro.iconphoto(False, windowIcon)
+	intro.iconbitmap(windowIcon)
 	intro.geometry("400x300")
 	intro.resizable(False, False)
 
@@ -226,7 +226,7 @@ def settingsUI(settings):
 
 	setting.focus_force()
 	setting.title("Settings")
-	setting.iconphoto(False, windowIcon)
+	setting.iconbitmap(windowIcon)
 	setting.geometry("400x300")
 	setting.resizable(False, False)
 
@@ -277,7 +277,7 @@ def aboutUI():
 
 	about.focus_force()
 	about.title("Credit")
-	about.iconphoto(False, windowIcon)
+	about.iconbitmap(windowIcon)
 	about.geometry("400x300")
 	about.resizable(False, False)
 
@@ -506,9 +506,9 @@ formatChoices.set(packFormats[5])
 
 # Sets the info about the window
 root.focus_force()
-windowIcon = PhotoImage(file = "icon.png")
+windowIcon = "icon.ico"
 root.title(programTitle)
-root.iconphoto(False, windowIcon)
+root.iconbitmap(windowIcon)
 root.minsize(550, 375)
 
 ### Feilds
