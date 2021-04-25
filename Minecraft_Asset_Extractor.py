@@ -65,15 +65,16 @@ def parseNestedArray(array):
 	array = array.replace("{", "")
 	array = array.replace("}", "")
 	array = array.replace("'", "")
-	array = array.split(", ")
+	array = array.replace(" ", "")
+	array = array.split(",")
 
 	for index in range(len(array)):
 		array[index] = array[index].split(":")
 	return array
 
-programTitle = parseNestedArray(configVaribles["program_info"])[0][1]
-author = parseNestedArray(configVaribles["program_info"])[1][1]
-programVersion = parseNestedArray(configVaribles["program_info"])[2][1]
+programTitle = configVaribles["program_info"]["title"]
+author = configVaribles["program_info"]["author"]
+programVersion = configVaribles["program_info"]["version"]
 
 class RowHandeler:
 	"""Helps automate the placement of lables.
@@ -505,7 +506,7 @@ formatChoices.set(packFormats[5])
 
 # Sets the info about the window
 root.focus_force()
-windowIcon = "icon.ico"
+windowIcon = configVaribles["program_info"]["icon"]
 root.title(programTitle)
 root.iconbitmap(windowIcon)
 root.minsize(550, 375)
