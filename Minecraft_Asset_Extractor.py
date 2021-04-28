@@ -91,7 +91,7 @@ class RowHandeler:
 
 def versionCheck(var = None, indx = None, mode = None):
 	try:
-		if AutoPack(minecraftVersion.get() >= 5):
+		if AutoPack(minecraftVersion.get()) >= 5:
 			shaders.configure(state="normal")
 		else:
 			shaders.configure(state="disabled")
