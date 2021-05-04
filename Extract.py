@@ -27,30 +27,37 @@ DELETE = False
 
 completed = 0
 
+def AutoPackCheck(version, index, defaultValue=0):
+	try:
+		return int(version.split(".")[index])
+	except:
+		return 0
+
+
 # Finds the pack format that matches with the selected version
 def AutoPack(version):
 	version = str(version)
-	if int(version.split(".")[1]) >= 17:
-		return int(version.split(".")[1]) - 10
-	elif int(version.split(".")[1]) == 16:
-		if int(version.split(".")[2]) >= 2:
+	if AutoPackCheck(version, 1) >= 17:
+		return AutoPackCheck(version, 1) - 10
+	elif AutoPackCheck(version, 1) == 16:
+		if AutoPackCheck(version, 2) >= 2:
 			return 6
 		else:
 			return 5
-	elif int(version.split(".")[1]) >= 15:
+	elif AutoPackCheck(version, 1) >= 15:
 		return 5
-	elif int(version.split(".")[1]) >= 13:
+	elif AutoPackCheck(version, 1) >= 13:
 		return 4
-	elif int(version.split(".")[1]) >= 11:
+	elif AutoPackCheck(version, 1) >= 11:
 		return 3
-	elif int(version.split(".")[1]) >= 9:
+	elif AutoPackCheck(version, 1) >= 9:
 		return 2
-	elif int(version.split(".")[1]) >= 7:
+	elif AutoPackCheck(version, 1) >= 7:
 		return 1
-	elif int(version.split(".")[1]) >= 6:
-		if int(version.split(".")[2]) == 1:
+	elif AutoPackCheck(version, 1) >= 6:
+		if AutoPackCheck(version, 2) == 1:
 			return 1
-	return 5
+	return 0
 
 # Clears the console
 def Clear(clear):
