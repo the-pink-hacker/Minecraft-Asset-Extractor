@@ -1,3 +1,6 @@
+# This is being rewritten from the ground up!
+[Minecraft Extractor](https://github.com/RyanGar46/minecraft-extractor) will replace this program. I have improved so much since I created this program, and it isn't worth trying to improve MAE.
+
 # Minecraft Asset Extractor
 Rips all of the assets out of minecraft. This is a **heavly** modified version of [minecraft.gamepedia.com/Tutorials/Sound_directory](https://minecraft.gamepedia.com/Tutorials/Sound_directory).
 
